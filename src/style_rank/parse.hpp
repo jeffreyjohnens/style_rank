@@ -193,34 +193,4 @@ public:
 	}
 };
 
-
-
-/* 
-// example of feature function
-// Piece *p will be the only argument
-std::unique_ptr<DISCRETE_DIST> example_feature() {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  for (int i=0; i<10; i++) {
-      d->insert(std::pair<uint64_t,uint64_t>(rand()%20, rand()%100));
-  }
-  return d;
-}
-
-int main() {
-
-    Collector m;
-    m.add("test", example_feature());
-    m.add("test", example_feature());
-
-    auto x = m.getData(10);
-
-    Piece *p = new Piece("/Users/Jeff/SFU/PhD/ISMIR_2019/CODE_APPENDIX/bach_midi/bwv2.6.mid");
-
-    for (const auto &c : p->chords) {
-        std::cout << c.__repr__();
-    }
-
-}
-*/
-
 #endif
