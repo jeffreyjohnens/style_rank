@@ -6,7 +6,9 @@ StyleRank is a method to measure the similarity between a MIDI file and an arbit
 
 ### Installing
 
+```python
 pip install style_rank
+```
 
 ## Built With
 
@@ -15,7 +17,7 @@ pip install style_rank
 
 ## Citation
 
-
+Ens,J. & Pasquier,P. Quantifying Musical Style: Ranking Symbolic Music based on Similarity to a Style. International Symposium on Music Information Retrieval(forthcoming 2019).
 
 ## License
 
