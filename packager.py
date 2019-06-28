@@ -26,7 +26,7 @@ with open("./src/style_rank/requirements.txt", "r") as f:
 install_requires += ['pybind11>=2.3']
 
 content = {
-  "URL" : "'https://gitlab.com/jeffreyjohnens/style_rank'",
+  "URL" : "'https://github.com/jeffreyjohnens/style_rank'",
   "PACKAGE_NAME" : "'style_rank'",
   "VERSION" : "'1.0.2'",
   "DESCRIPTION" : "''",
