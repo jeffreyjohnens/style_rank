@@ -4,20 +4,29 @@
 #include "feature_map.hpp"
 
 #include <tuple>
+#include <vector>
+#include <string>
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 namespace py = pybind11;
 
-std::tuple<VECTOR_MAP,VECTOR_MAP,std::vector<int>> get_features_internal(std::vector<std::string> &paths, int upper_bound) {
+std::vector<std::string> get_feature_names() {
+  return extract_keys<std::string,std::unique_ptr<DISCRETE_DIST>(*)(Piece*)>(m);
+}
+
+std::tuple<VECTOR_MAP,VECTOR_MAP,std::vector<int>> get_features_internal(std::vector<std::string> &paths, std::vector<std::string> &feature_names, int upper_bound) {
+  if (feature_names.size() == 0) {
+    feature_names = get_feature_names();
+  }
   Collector c;
   std::vector<int> indices;
   for (int i=0; i<paths.size(); i++) {
     Piece *p = new Piece(paths[i]);
     if ((p) && (p->chords.size() > 10)) {
-      for (const auto &feature : m) {
-        c.add(feature.first, feature.second(p));
+      for (const auto &name : feature_names) {
+        c.add(name, m[name](p));
       }
       indices.push_back(i);
     }
@@ -38,5 +47,6 @@ PYBIND11_PLUGIN(style_rank) {
     )doc");
 
   m.def("get_features_internal", &get_features_internal);
+  m.def("get_feature_names", &get_feature_names);
   return m.ptr();
 }

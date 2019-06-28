@@ -4,10 +4,7 @@ import os
 
 if __name__ == "__main__":
 
-  root = "/Users/Jeff/Code/ISMIR_2019/CODE_APPENDIX/bach_midi"
-  paths = [os.path.join(root,p) for p in os.listdir(root) if p.endswith(".mid")]
-  data, domains, indices = sr.get_features(paths)
+  paths = ["/Users/Jeff/sfu/phd/style_rank/bwv2.6.mid", "/Users/Jeff/sfu/phd/style_rank/bwv3.6.mid", "garbage"]
 
-  d = sr.get_distance_matrix(paths, np.random.randint(2,size=(len(paths),)))
-
-  print(d.shape)
+  data, domains, indices = sr.get_features(paths, features=["ChordSize"])
+  sr.get_feature_csv(paths, "test_csv_output")

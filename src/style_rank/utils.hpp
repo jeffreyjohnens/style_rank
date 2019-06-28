@@ -94,6 +94,15 @@ std::vector<TK> extract_keys(std::multimap<TK, TV> &src) {
   return ret;
 }
 
+template<typename TK, typename TV>
+std::vector<TK> extract_keys(std::unordered_map<TK, TV> &src) {
+  std::vector<TK> ret;
+  for (auto const& element : src) {
+    ret.push_back(element.first);
+  }
+  return ret;
+}
+
 // how to make function for all containers?
 template<typename TK, typename TV>
 void print(std::unordered_map<TK,TV> const& src) {

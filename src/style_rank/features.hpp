@@ -17,60 +17,8 @@ int lcm(int a, int b) {
   return max;
 }
 
-int quantize(int x, int ticks, int d=16, int t=16) {
-  static int U = 64;
-  assert(d <= U);
-  assert(t <= U);
-  assert((d & (d-1)) == 0);
-  assert((t & (t-1)) == 0);
-  double m = (((double)x / ticks) - (int)((double)x / ticks)) * U * 3;
-  int mm = 0;
-  double md = m;
-  int idx = 0;
-  for (int i=0; i<U*3; i++) {
-    if ((i % ((U / d) * 3) == 0) || (i % ((U / t) * 2) == 0)) {
-      if (abs(i - m) < md) {
-        md = abs(i - m);
-        mm = idx;
-      }
-      idx++;
-    }
-  }
-  return (int)((double)x / ticks) * idx + mm;
-}
-
 int rough_quantize(int x, int ticks) {
   return (int)std::round((double)x / ticks * 8);
-}
-
-template<size_t N>
-double chi2_dist(std::array<int,N> a, std::array<int,N> b) {
-  double suma = 0;
-  double sumb = 0;
-  for (int i=0; i<N; i++) {
-    suma += a[i];
-    sumb += b[i];
-  }
-  double d = 0;
-  for (int i=0; i<N; i++) {
-    double anorm = (double)a[i] / suma;
-    double bnorm = (double)b[i] / sumb;
-    if (anorm + bnorm > 0) {
-      d += pow(anorm - bnorm, 2) / (anorm + bnorm);
-    }
-  }
-  return d;
-}
-
-// technically efficieny
-double entropy(DISCRETE_DIST &d) {
-  double sum = 0;
-  double e = 0;
-  for (const auto &kv : d)
-    sum += kv.second;
-  for (const auto &kv : d)
-    e += ((double)kv.second / sum) * log((double)kv.second / sum);
-  return e / log(d.size());
 }
 
 std::unique_ptr<DISCRETE_DIST> IntervalDist(Piece *p) {
