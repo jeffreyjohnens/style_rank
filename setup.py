@@ -98,12 +98,12 @@ class CMakeBuild(build_ext):
         copymode(src_file, dest_file)
 
 # automatically adds the requires
-with open("./src/style_rank/requirements.txt", "r") as f:
-    install_requires = [" ".join(l.split()) for l in f.readlines()]
+#with open("./src/style_rank/requirements.txt", "r") as f:
+#    install_requires = [" ".join(l.split()) for l in f.readlines()]
 
 setup(
     name='style_rank',
-    version='0.2',
+    version='0.3.2',
     author='Anonymous',
     author_email='anonymous@website.com',
     description='A python module for feature extraction',
@@ -114,6 +114,6 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild),
     test_suite='tests',
     zip_safe=False,
-    install_requires=install_requires,
+    install_requires=['numpy==1.15.1', 'scikit_learn==0.21.2'],
     url="https://gitlab.com/jeffreyjohnens/style_rank"
 )
