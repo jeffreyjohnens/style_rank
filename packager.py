@@ -19,7 +19,6 @@ for dirs, subdirs, paths in os.walk(root):
 
 cpp_paths = [p for p in all_paths if p.endswith(".cpp")]
 
-
 # automatically get the requirements
 call(["pipreqs", "./src/style_rank", "--force"])
 with open("./src/style_rank/requirements.txt", "r") as f:
@@ -27,8 +26,9 @@ with open("./src/style_rank/requirements.txt", "r") as f:
 install_requires += ['pybind11>=2.3']
 
 content = {
+  "URL" : "'https://gitlab.com/jeffreyjohnens/style_rank'",
   "PACKAGE_NAME" : "'style_rank'",
-  "VERSION" : "'1.0.1'",
+  "VERSION" : "'1.0.2'",
   "DESCRIPTION" : "''",
   "INSTALL_REQUIRES" : repr(install_requires),
   "SRC_PATHS" : repr(cpp_paths)
@@ -36,4 +36,7 @@ content = {
 
 create_from_template("setup_TEMPLATE.py", "setup.py", content)
 
-# then we need to do some more
+# clean dist and build
+call(["rm", "-rf", "dist"])
+call(["python3", "setup.py", "sdist"])
+#call(["twine", "upload", "dist/*"])
