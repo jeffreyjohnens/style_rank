@@ -15,10 +15,12 @@ pip install style_rank
 * [pybind11](https://github.com/pybind/pybind11) - c++ integration 
 * [midifile](https://midifile.sapp.org/) - midi parsing
 
-## Citation
+## Citing
 
-Ens,J. & Pasquier,P. Quantifying Musical Style: Ranking Symbolic Music based on Similarity to a Style. International Symposium on Music Information Retrieval(forthcoming 2019).
+If you want to cite StyleRank, please use the following citation.
+
+Ens,J. and Pasquier,P. Quantifying Musical Style: Ranking Symbolic Music based on Similarity to a Style. International Symposium on Music Information Retrieval (forthcoming 2019).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the ISC License - see the [LICENSE.md](LICENSE.md) file for details
