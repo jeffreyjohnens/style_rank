@@ -114,5 +114,6 @@ setup(
     cmdclass=dict(build_ext=CMakeBuild),
     test_suite='tests',
     zip_safe=False,
-    install_requires=install_requires
+    install_requires=install_requires,
+    url="https://gitlab.com/jeffreyjohnens/style_rank"
 )
