@@ -36,27 +36,29 @@ def get_scale_rep(x):
 def roll_bit(x, n=12):
 	return ((x << np.arange(n)) | (x >> (n - np.arange(n)))) & 4095
 
-pcd = np.array([get_pcd(i) for i in np.arange(4096)])
-rot = np.array([get_rot(i) for i in np.arange(4096)])
-pcscale = np.array([get_scale_rep(i) for i in np.arange(4096)])
-pcbool = (np.arange(4096)[:,None] & power[None,:]).astype(np.bool)
-pcsize = pcbool.sum(1)
-iccount = np.array([get_ic_count(i) for i in np.arange(4096)])
-istriad = np.zeros((4096,), dtype=np.int32)
-path_length = np.load("tonnetz_path_lengths.npz")["data"]
+if __name__ == "__main__":
 
-prefix = "static const uint64_t "
-with open("pcd.hpp", "w") as f:
-	f.write("#ifndef STYLE_RANK_PCD_H\n")
-	f.write("#define STYLE_RANK_PCD_H\n")
-	f.write(prefix + "npcd = " + str(np.max(pcd)+1) + ";\n")
-	f.write(prefix + "pcd[4096] = {" + repr(list(pcd))[1:-1] + "};\n")
-	f.write(prefix + "rot[4096] = {" + repr(list(rot))[1:-1] + "};\n")
-	f.write(prefix + "iccount[4096] = {" + repr(list(iccount))[1:-1] + "};\n")
-	f.write(prefix + "pcsize[4096] = {" + repr(list(pcsize))[1:-1] + "};\n")
-	f.write(prefix + "pcscale[4096] = {" + repr(list(pcscale))[1:-1] + "};\n")
-	f.write(prefix + "istriad[4096] = {" + repr(list(istriad))[1:-1] + "};\n")
-	f.write(prefix + "tonnetz[4096] = {" + repr(list(path_length))[1:-1] + "};\n")
-	f.write(prefix + "dissfracnum[256] = {" + repr(list(_FRACTIONS[:,0]))[1:-1] + "};\n")
-	f.write(prefix + "dissfracden[256] = {" + repr(list(_FRACTIONS[:,1]))[1:-1] + "};\n")
-	f.write("#endif\n")
+	pcd = np.array([get_pcd(i) for i in np.arange(4096)])
+	rot = np.array([get_rot(i) for i in np.arange(4096)])
+	pcscale = np.array([get_scale_rep(i) for i in np.arange(4096)])
+	pcbool = (np.arange(4096)[:,None] & power[None,:]).astype(np.bool)
+	pcsize = pcbool.sum(1)
+	iccount = np.array([get_ic_count(i) for i in np.arange(4096)])
+	istriad = np.zeros((4096,), dtype=np.int32)
+	path_length = np.load("tonnetz_path_lengths.npz")["data"]
+
+	prefix = "static const uint64_t "
+	with open("pcd.hpp", "w") as f:
+		f.write("#ifndef STYLE_RANK_PCD_H\n")
+		f.write("#define STYLE_RANK_PCD_H\n")
+		f.write(prefix + "npcd = " + str(np.max(pcd)+1) + ";\n")
+		f.write(prefix + "pcd[4096] = {" + repr(list(pcd))[1:-1] + "};\n")
+		f.write(prefix + "rot[4096] = {" + repr(list(rot))[1:-1] + "};\n")
+		f.write(prefix + "iccount[4096] = {" + repr(list(iccount))[1:-1] + "};\n")
+		f.write(prefix + "pcsize[4096] = {" + repr(list(pcsize))[1:-1] + "};\n")
+		f.write(prefix + "pcscale[4096] = {" + repr(list(pcscale))[1:-1] + "};\n")
+		f.write(prefix + "istriad[4096] = {" + repr(list(istriad))[1:-1] + "};\n")
+		f.write(prefix + "tonnetz[4096] = {" + repr(list(path_length))[1:-1] + "};\n")
+		f.write(prefix + "dissfracnum[256] = {" + repr(list(_FRACTIONS[:,0]))[1:-1] + "};\n")
+		f.write(prefix + "dissfracden[256] = {" + repr(list(_FRACTIONS[:,1]))[1:-1] + "};\n")
+		f.write("#endif\n")
