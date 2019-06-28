@@ -23,10 +23,10 @@ class CMakeExtension(Extension):
 class CMakeBuild(build_ext):
     def run(self):
         # before we compile create the feature map
-        cwd = os.getcwd()
-        os.chdir("./src/style_rank")
-        subprocess.call(["python3", "create_pcint_header.py"])
-        os.chdir(cwd)
+        #cwd = os.getcwd()
+        #os.chdir("./src/style_rank")
+        #subprocess.call(["python3", "create_pcint_header.py"])
+        #os.chdir(cwd)
         try:
             out = subprocess.check_output(['cmake', '--version'])
         except OSError:
