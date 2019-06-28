@@ -19,8 +19,8 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'style_rank',
-        ['src/style_rank/bindings.cpp', 'src/style_rank/deps/MidiEventList.cpp', 'src/style_rank/deps/MidiMessage.cpp', 'src/style_rank/deps/Binasc.cpp', 'src/style_rank/deps/MidiEvent.cpp', 'src/style_rank/deps/MidiFile.cpp'],
+        $PACKAGE_NAME,
+        $SRC_PATHS,
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
@@ -93,17 +93,17 @@ class BuildExt(build_ext):
         build_ext.build_extensions(self)
 
 setup(
-    name='style_rank',
-    version='1.0.1',
+    name=$PACKAGE_NAME,
+    version=$VERSION,
     author='Jeff Ens',
     author_email='jeffreyjohnens@gmail.com',
     url='https://gitlab.com/jeffreyjohnens/style_rank',
-    description='',
+    description=$DESCRIPTION,
     long_description='',
     ext_modules=ext_modules,
     package_dir = {'': 'src'},
     packages = ['style_rank'],
-    install_requires=['numpy==1.15.1', 'scikit_learn==0.21.2', 'pybind11>=2.3'],
+    install_requires=$INSTALL_REQUIRES,
     setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
