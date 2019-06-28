@@ -103,7 +103,7 @@ class CMakeBuild(build_ext):
 
 setup(
     name='style_rank',
-    version='0.3.2',
+    version='0.3.3',
     author='Anonymous',
     author_email='anonymous@website.com',
     description='A python module for feature extraction',
