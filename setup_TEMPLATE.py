@@ -19,13 +19,14 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        $PACKAGE_NAME,
-        $SRC_PATHS,
+        'style_rank._style_rank',
+        $CPP_PATHS,
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
             get_pybind_include(user=True)
         ],
+        depends=$HPP_PATHS,
         language='c++'
     ),
 ]

@@ -19,13 +19,14 @@ class get_pybind_include(object):
 
 ext_modules = [
     Extension(
-        'style_rank',
+        'style_rank._style_rank',
         ['src/style_rank/bindings.cpp', 'src/style_rank/deps/MidiEventList.cpp', 'src/style_rank/deps/MidiMessage.cpp', 'src/style_rank/deps/Binasc.cpp', 'src/style_rank/deps/MidiEvent.cpp', 'src/style_rank/deps/MidiFile.cpp'],
         include_dirs=[
             # Path to pybind11 headers
             get_pybind_include(),
             get_pybind_include(user=True)
         ],
+        depends=['src/style_rank/features.hpp', 'src/style_rank/feature_map_template.hpp', 'src/style_rank/feature_map.hpp', 'src/style_rank/pcd.hpp', 'src/style_rank/utils.hpp', 'src/style_rank/parse.hpp', 'src/style_rank/deps/MidiEvent.h', 'src/style_rank/deps/MidiFile.h', 'src/style_rank/deps/MidiEventList.h', 'src/style_rank/deps/Binasc.h', 'src/style_rank/deps/MidiMessage.h'],
         language='c++'
     ),
 ]
@@ -94,10 +95,10 @@ class BuildExt(build_ext):
 
 setup(
     name='style_rank',
-    version='1.0.2',
+    version='1.0.9',
     author='Jeff Ens',
     author_email='jeffreyjohnens@gmail.com',
-    url='https://gitlab.com/jeffreyjohnens/style_rank',
+    url='https://github.com/jeffreyjohnens/style_rank',
     description='',
     long_description='',
     ext_modules=ext_modules,

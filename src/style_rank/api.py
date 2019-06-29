@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import OneHotEncoder
 
 # import c++ code
-from .style_rank import get_features_internal, get_feature_names
+from ._style_rank import get_features_internal, get_feature_names
 
 def filter_valid_paths(paths):
   valid_paths = []

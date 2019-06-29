@@ -34,19 +34,7 @@ std::tuple<VECTOR_MAP,VECTOR_MAP,std::vector<int>> get_features_internal(std::ve
   return std::tuple_cat(c.getData(upper_bound), std::tie(indices));
 }
 
-PYBIND11_PLUGIN(style_rank) {
-  py::module m("style_rank", R"doc(
-        Python module
-        -----------------------
-        .. currentmodule:: style_rank
-        .. autosummary::
-           :toctree: _generate
-
-           add
-           subtract
-    )doc");
-
+PYBIND11_MODULE(_style_rank,m) {
   m.def("get_features_internal", &get_features_internal);
   m.def("get_feature_names", &get_feature_names);
-  return m.ptr();
 }

@@ -18,6 +18,7 @@ for dirs, subdirs, paths in os.walk(root):
     all_paths.append( os.path.join(dirs, path) )
 
 cpp_paths = [p for p in all_paths if p.endswith(".cpp")]
+hpp_paths = [p for p in all_paths if p.endswith(".hpp") or p.endswith(".h")]
 
 # automatically get the requirements
 call(["pipreqs", "./src/style_rank", "--force"])
@@ -25,13 +26,16 @@ with open("./src/style_rank/requirements.txt", "r") as f:
   install_requires = [" ".join(l.split()) for l in f.readlines()]
 install_requires += ['pybind11>=2.3']
 
+version_number = 9
+
 content = {
   "URL" : "'https://github.com/jeffreyjohnens/style_rank'",
   "PACKAGE_NAME" : "'style_rank'",
-  "VERSION" : "'1.0.2'",
+  "VERSION" : "'1.0.{}'".format(version_number),
   "DESCRIPTION" : "''",
   "INSTALL_REQUIRES" : repr(install_requires),
-  "SRC_PATHS" : repr(cpp_paths)
+  "CPP_PATHS" : repr(cpp_paths),
+  "HPP_PATHS" : repr(hpp_paths)
 }
 
 create_from_template("setup_TEMPLATE.py", "setup.py", content)
@@ -39,4 +43,11 @@ create_from_template("setup_TEMPLATE.py", "setup.py", content)
 # clean dist and build
 call(["rm", "-rf", "dist"])
 call(["python3", "setup.py", "sdist"])
-#call(["twine", "upload", "dist/*"])
+call(["twine", "upload", "dist/*"])
+exit()
+
+
+# test
+call(["pip3", "uninstall", "style_rank", "-y"])
+call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
+call(["pip3", "install", "-e" "style_rank-1.0.{}".format(version_number)])
