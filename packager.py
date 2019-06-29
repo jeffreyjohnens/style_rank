@@ -43,11 +43,12 @@ create_from_template("setup_TEMPLATE.py", "setup.py", content)
 # clean dist and build
 call(["rm", "-rf", "dist"])
 call(["python3", "setup.py", "sdist"])
-call(["twine", "upload", "dist/*"])
-exit()
+
+#call(["twine", "upload", "dist/*"])
+#exit()
 
 
-# test
+# test the build ... will show all warnings
 call(["pip3", "uninstall", "style_rank", "-y"])
 call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
-call(["pip3", "install", "-e" "style_rank-1.0.{}".format(version_number)])
+call(["pip3", "install", "-vvv", "-e", "style_rank-1.0.{}".format(version_number)])
