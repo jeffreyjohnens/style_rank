@@ -1,10 +1,15 @@
-#include <catch.hpp>
 #include <vector>
 #include <array>
+#include "parse.hpp"
+#include "catch/catch.hpp"
 
 //#include "parse.hpp"
 //#include "features.hpp"
 //#include "collector.hpp"
+
+/*
+g++ -I../src/style_rank -I../src/style_rank/deps -o test test_features.cpp ../src/style_rank/deps/Binasc.cpp ../src/style_rank/deps/MidiEvent.cpp ../src/style_rank/deps/MidiEventList.cpp ../src/style_rank/deps/MidiFile.cpp ../src/style_rank/deps/MidiMessage.cpp -std=c++14
+*/
 
 /*
 -##-----
@@ -28,6 +33,10 @@ static std::vector<std::array<int,3>> example_notes = {
     {62,6,2},
     {59,6,2}
 };
+
+int main() {
+
+}
 
 /*
 TEST_CASE("SIMPLE_MIDI_PARSE")

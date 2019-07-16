@@ -102,7 +102,7 @@ public:
 	int track_count;
 	int max_duration;
 
-    // this seems to be for testing
+    // this is for for testing
 	Piece (std::vector<std::array<int,3>> &notes) {
 		for (const auto &note : notes) {
 			addNote(note[0], note[1], note[2]);
