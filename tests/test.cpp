@@ -1,15 +1,9 @@
+#define CATCH_CONFIG_MAIN
+#include "catch.h"
 #include <vector>
 #include <array>
-#include "parse.hpp"
-#include "catch/catch.hpp"
+#include "../src/style_rank/parse.hpp"
 
-//#include "parse.hpp"
-//#include "features.hpp"
-//#include "collector.hpp"
-
-/*
-g++ -I../src/style_rank -I../src/style_rank/deps -o test test_features.cpp ../src/style_rank/deps/Binasc.cpp ../src/style_rank/deps/MidiEvent.cpp ../src/style_rank/deps/MidiEventList.cpp ../src/style_rank/deps/MidiFile.cpp ../src/style_rank/deps/MidiMessage.cpp -std=c++14
-*/
 
 /*
 -##-----
@@ -31,27 +25,20 @@ static std::vector<std::array<int,3>> example_notes = {
     {54,5,2},
     {62,5,1},
     {62,6,2},
+    {62,6,1},
     {59,6,2}
 };
 
-int main() {
-
+TEST_CASE("SIMPLE_MIDI_PARSE")
+{
+    Piece *p = new Piece(example_notes);
+    REQUIRE(p->unique_onsets.size() == 7); // one extra for last onset
+    REQUIRE(p->chords.size() == 6); // has six chords
+    REQUIRE(p->notes.size() == 11); // has ten notes
+    //REQUIRE(p->chords[0].notes[0]->pitch == 60); // notes should be sorted
 }
 
 /*
-TEST_CASE("SIMPLE_MIDI_PARSE")
-{
-    // pitch, onset, duration
-    std::vector<std::array<int,3>> notes = {{62, 0, 1}, {60, 0, 1}, {60, 1, 2}};
-    Piece *p = new Piece(notes);
-
-    REQUIRE(p->unique_onsets.size() == 3); // one extra for last onset
-    REQUIRE(p->chords.size() == 2); // has two chords
-    REQUIRE(p->notes.size() == 3); // has three notes
-    REQUIRE(p->chords[0].notes[0]->pitch == 60); // notes should be sorted
-
-}
-
 TEST_CASE("EMPTY_MIDI_PARSE")
 {
     std::vector<std::array<int,3>> notes;
