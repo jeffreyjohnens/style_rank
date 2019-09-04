@@ -16,14 +16,14 @@ def create_arrow_marker(dwg):
     #       <path d="M0,0 L0,6 L9,3 z" fill="#f00" />
     #     </marker>
     #   </defs>
-    arrow = dwg.marker(id='arrow', insert=(0, 3), size=(10, 10), orient='auto', markerUnits='strokeWidth')
+    arrow = dwg.marker(id='arrow', insert=(0,3), size=(5, 5), orient='auto', markerUnits='strokeWidth')
     arrow.add(dwg.path(d='M0,0 L0,6 L6,3 z', fill=dark_color))
     dwg.defs.add(arrow)
     return arrow
 
 def use(name):
 
-    w, h = '100%', '100%'
+    w, h = (1200, 800) #'100%', '100%'
     dwg = svgwrite.Drawing(filename=name, size=(w, h), debug=True)
     dwg.add(dwg.rect(insert=(0,0), size=(w, h), fill=svgwrite.rgb(235,235,235), stroke='black'))
 
@@ -108,9 +108,17 @@ def use(name):
     dwg.add(dwg.text("B", x=[875], y=[560], font_size=20, style=style, fill=dark_color))
     dwg.add(dwg.text("C", x=[1095], y=[560], font_size=20, style=style,fill=dark_color))
 
-    
+    #dwg.add(dwg.text.TextArea("In section A, each Random Forest classifier is trained to discriminate between generated musical excerpts (G0,G1,...) and a curated collection of musical excerpts (C0,C1,...) given a specific feature based representation (F1,F2). Concretely, the Random Forest classifier is trained to output 0 when provided a generated input and 1 otherwise.", insert=(80,600), size=(900,200), font_size=10, style=style, fill=dark_color))
 
     dwg.save()
 
 if __name__ == '__main__':
     use("example.svg")
+
+    #from svglib.svglib import svg2rlg
+    #from reportlab.graphics import renderPDF
+    #drawing = svg2rlg("example.svg")
+    #renderPDF.drawToFile(drawing, "example.pdf")
+
+    import cairosvg
+    cairosvg.svg2pdf(url='example.svg', write_to='example.pdf')
