@@ -128,7 +128,7 @@ public:
         labels.push_back(label);
     }
  
-    std::tuple<VECTOR_MAP,VECTOR_MAP> getData(int upper_bound) {
+    std::tuple<VECTOR_MAP,VECTOR_MAP> getData(size_t upper_bound) {
         
         VECTOR_MAP ret;
         VECTOR_MAP domains;

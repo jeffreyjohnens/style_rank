@@ -14,6 +14,8 @@
 #include "./deps/MidiFile.h"
 #include "utils.hpp"
 
+using namespace std;
+
 static const int MAX_CHORD_SIZE = 24;
 static const int interval_class[12] = {0,1,2,3,4,5,6,5,4,3,2,1};
 
@@ -40,23 +42,23 @@ public:
 
 class CHORD {
 public:
-	std::vector<NOTE*> notes;
-	std::vector<NOTE*> onset_notes;
-	std::vector<NOTE*> tie_notes;
-	size_t duration;
-	size_t onset;
-	CHORD(std::vector<NOTE*> x, size_t _duration, size_t _onset) {
-		std::sort(x.begin(), x.end(), [](NOTE *a, NOTE *b){return a->pitch < b->pitch;});
-		std::copy(x.begin(), x.end(), std::back_inserter(notes));
-		std::copy_if(x.begin(), x.end(), std::back_inserter(onset_notes), [_onset](NOTE *a){return a->onset == _onset;} );
-		std:copy_if(x.begin(), x.end(), std::back_inserter(tie_notes), [_onset](NOTE *a){return a->onset != _onset;});
+	vector<NOTE*> notes;
+	vector<NOTE*> onset_notes;
+	vector<NOTE*> tie_notes;
+	int duration;
+	int onset;
+	CHORD(vector<NOTE*> x, int _duration, int _onset) {
+		sort(x.begin(), x.end(), [](NOTE *a, NOTE *b){return a->pitch < b->pitch;});
+		copy(x.begin(), x.end(), back_inserter(notes));
+		copy_if(x.begin(), x.end(), back_inserter(onset_notes), [_onset](NOTE *a){return a->onset == _onset;} );
+		copy_if(x.begin(), x.end(), back_inserter(tie_notes), [_onset](NOTE *a){return a->onset != _onset;});
 		duration = _duration;
 		onset = _onset;
 	}
-    std::string __repr__() const {
-        std::string repr = "CHORD [ ";
+    string __repr__() const {
+        string repr = "CHORD [ ";
         for (const auto &note : notes) {
-            repr += std::to_string(note->pitch) + " ";
+            repr += to_string(note->pitch) + " ";
         }
         return repr + "]\n";
     }
@@ -65,18 +67,18 @@ public:
 class PCINT {
 public:
     int value;
-    PCINT(std::vector<int> &x) {
+    PCINT(vector<int> &x) {
         value = 0;
-        for (int i=0; i<x.size(); i++)
+        for (int i=0; i<(int)x.size(); i++)
             value |= (1 << mod(x[i], 12));
     }
-	PCINT(std::vector<int>::iterator begin, std::vector<int>::iterator end) {
+	PCINT(vector<int>::iterator begin, vector<int>::iterator end) {
 		value = 0;
         for (auto it = begin; it != end; it++) {
             value |= (1 << mod(*it, 12));
     }
 }
-    PCINT(const std::vector<NOTE*> &notes) {
+    PCINT(const vector<NOTE*> &notes) {
         value = 0;
         for (const auto &note : notes) {
             value |= (1 << mod(note->pitch, 12));
@@ -87,30 +89,35 @@ public:
 class Piece {
 public:
 
-	std::multimap<int,NOTE*> stree;
-	std::multimap<int,NOTE*> etree;
+	multimap<int,NOTE*> stree;
+	multimap<int,NOTE*> etree;
 
-	std::set<int> unique_onsets_set;
-	std::set<int> unique_offsets_set;
-	std::vector<int> unique_onsets;
-	std::vector<int> unique_offsets;
+	set<int> unique_onsets_set;
+	set<int> unique_offsets_set;
+	vector<int> unique_onsets;
+	vector<int> unique_offsets;
 
-	std::vector<CHORD> chords;
-	std::vector<std::unique_ptr<NOTE>> notes;
+	vector<CHORD> chords;
+	vector<unique_ptr<NOTE>> notes;
 
 	int ticks;
 	int track_count;
 	int max_duration;
 
     // this is for for testing
-	Piece (std::vector<std::array<int,3>> &notes) {
+	Piece (vector<array<int,3>> &notes) {
+		max_duration = 0;
+		ticks = 1;
 		for (const auto &note : notes) {
+			if (note[2] > max_duration) {
+				max_duration = note[2];
+			}
 			addNote(note[0], note[1], note[2]);
 		}
 		findChords();
 	}
 
-	Piece(std::string filepath, int resolution=8, bool skip_chords=false) {
+	Piece(string filepath, int resolution=8, bool skip_chords=false) {
 
 		smf::MidiFile midifile;
 		QUIET_CALL(midifile.read(filepath));
@@ -119,7 +126,7 @@ public:
 		ticks = midifile.getTicksPerQuarterNote();
 		max_duration = 0;
 
-		int pitch, duration, velocity, onset, mid, rel_onset;
+		int pitch, duration, velocity, onset;
 
 		for (int track=0; track<track_count; track++) {
 			for (int event=0; event<midifile[track].size(); event++) {
@@ -151,7 +158,7 @@ public:
 	void addNote(int pitch, int onset, int duration, int velocity=100) {
 		if (duration <= 0) return;
 		notes.push_back( 
-            std::unique_ptr<NOTE>(new NOTE(pitch, onset, duration, velocity)) );
+            unique_ptr<NOTE>(new NOTE(pitch, onset, duration, velocity)) );
 
 		unique_onsets_set.insert( onset );
 		unique_offsets_set.insert( onset + duration );	
@@ -161,13 +168,13 @@ public:
 		if (notes.size() <= 0) return;
 
 		for (const auto &note : notes) {
-			stree.insert( std::make_pair(note->onset, note.get()) );
-			etree.insert( std::make_pair(note->end, note.get()) );
+			stree.insert( make_pair(note->onset, note.get()) );
+			etree.insert( make_pair(note->end, note.get()) );
 		}
 
-		std::copy(unique_onsets_set.begin(), unique_onsets_set.end(), std::back_inserter(unique_onsets));
+		copy(unique_onsets_set.begin(), unique_onsets_set.end(), back_inserter(unique_onsets));
 
-		std::copy(unique_offsets_set.begin(), unique_offsets_set.end(), std::back_inserter(unique_offsets));
+		copy(unique_offsets_set.begin(), unique_offsets_set.end(), back_inserter(unique_offsets));
 
         // add the last offset
 		unique_onsets.push_back(unique_offsets.back());
@@ -180,9 +187,9 @@ public:
 		}
 	}
 
-	std::vector<NOTE*> findOverlapping(int s, int e) {
+	vector<NOTE*> findOverlapping(int s, int e) {
 		assert(s < e);
-		std::vector<NOTE*> notevec;
+		vector<NOTE*> notevec;
 		auto itend = etree.upper_bound(s+max_duration);
 	    for (auto it = etree.upper_bound(s); it != itend; it++) {
 			if (it->second->onset <= s) {

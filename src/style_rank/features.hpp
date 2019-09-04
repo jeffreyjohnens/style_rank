@@ -5,6 +5,8 @@
 #include "pcd.hpp"
 #include <cmath>
 
+using namespace std;
+
 int lcm(int a, int b) {
   int max = (a > b) ? a : b;
   while(true) {
@@ -18,15 +20,14 @@ int lcm(int a, int b) {
 }
 
 int rough_quantize(int x, int ticks) {
-  return (int)std::round((double)x / ticks * 8);
+  return (int)round((double)x / ticks * 8);
 }
 
-std::unique_ptr<DISCRETE_DIST> IntervalDist(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  uint64_t total = 0;
+unique_ptr<DISCRETE_DIST> IntervalDist(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     for (int j=0; j<chord.notes.size(); j++) {
-      for (int k=j+1; k<chord.notes.size(); k++) {
+      for (int k=j+1; k<(int)chord.notes.size(); k++) {
         (*d)[mod(chord.notes[k]->pitch - chord.notes[j]->pitch, 12)] += chord.duration;
       }
     }
@@ -34,12 +35,11 @@ std::unique_ptr<DISCRETE_DIST> IntervalDist(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> IntervalClassDist(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  uint64_t total = 0;
+unique_ptr<DISCRETE_DIST> IntervalClassDist(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
-    for (int j=0; j<chord.notes.size(); j++) {
-      for (int k=j+1; k<chord.notes.size(); k++) {
+    for (int j=0; j<(int)chord.notes.size(); j++) {
+      for (int k=j+1; k<(int)chord.notes.size(); k++) {
         (*d)[interval_class[mod(chord.notes[k]->pitch - chord.notes[j]->pitch, 12)]] += chord.duration;
       }
     }
@@ -47,22 +47,22 @@ std::unique_ptr<DISCRETE_DIST> IntervalClassDist(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordSize(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordSize(Piece *p) {
   /*
   The number of pitches in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[chord.notes.size()]++;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordPCSizeRatio(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordPCSizeRatio(Piece *p) {
   /*
   The ratio of distinct pitch classes to number of pitches in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     int pc[12] = {0};
     int pccount = 0;
@@ -77,14 +77,14 @@ std::unique_ptr<DISCRETE_DIST> ChordPCSizeRatio(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnsetRatio(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordOnsetRatio(Piece *p) {
   /*
   The ratio of onsets to number of pitches in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     int onset = 0;
-    for (int i=0; i<chord.notes.size(); i++) {
+    for (int i=0; i<(int)chord.notes.size(); i++) {
       if (chord.notes[i]->onset == chord.onset)
         onset++;
     }
@@ -94,13 +94,13 @@ std::unique_ptr<DISCRETE_DIST> ChordOnsetRatio(Piece *p) {
 }
 
 // should these be logged first?
-std::unique_ptr<DISCRETE_DIST> ChordDistinctDurationRatio(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordDistinctDurationRatio(Piece *p) {
   /*
   The ratio of distinct durations to the number of pitches in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
-    std::map<int,int> durations;
+    map<int,int> durations;
     for (const auto &note : chord.notes) {
       durations[note->onset + note->duration - chord.onset] = 1;
     }
@@ -109,22 +109,22 @@ std::unique_ptr<DISCRETE_DIST> ChordDistinctDurationRatio(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordDuration(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordDuration(Piece *p) {
   /*
   The duration of a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[rough_quantize(chord.duration, p->ticks)]++;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordShape(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordShape(Piece *p) {
   /*
   The pitches in a chord represented as bits in an integer, where the lowest pitch corresponding to the LSB.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     int m = chord.notes[0]->pitch;
     uint64_t shape = 0;
@@ -137,11 +137,11 @@ std::unique_ptr<DISCRETE_DIST> ChordShape(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnsetShape(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordOnsetShape(Piece *p) {
   /*
   The onset pitches in a chord represeted as bits in an integer, where the lowest pitch corresponding to the LSB
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     int m = chord.onset_notes[0]->pitch;
     uint64_t shape = 0;
@@ -155,49 +155,49 @@ std::unique_ptr<DISCRETE_DIST> ChordOnsetShape(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordPCD(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordPCD(Piece *p) {
   /*
   The distinct pitch class set of notes represented as bits in an integer.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[pcd[PCINT(chord.notes).value]] += chord.duration;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordPCDWBass(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordPCDWBass(Piece *p) {
   /*
   The distinct pitch class set of notes represented as bits in an integer. W bass
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[mod(chord.notes.front()->pitch,12) + (pcd[PCINT(chord.notes).value] << 12)] += chord.duration;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnsetPCD(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordOnsetPCD(Piece *p) {
   /*
   The distinct pitch class set of onset notes represented as bits in an integer.
   */
- auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+ auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
  for (const auto &chord : p->chords) {
    (*d)[pcd[PCINT(chord.onset_notes).value]] += chord.duration;
  }
  return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnsetTiePCD(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> ChordOnsetTiePCD(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[pcd[PCINT(chord.onset_notes).value] + (pcd[PCINT(chord.tie_notes).value] << 12)] += chord.duration;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnsetTiePCDTogether(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> ChordOnsetTiePCDTogether(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     // get the number of rotations
     int r = rot[PCINT(chord.notes).value];
@@ -214,25 +214,25 @@ std::unique_ptr<DISCRETE_DIST> ChordOnsetTiePCDTogether(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTonnetz(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTonnetz(Piece *p) {
   /*
   The distinct pitch class represented as bits in an integer.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     (*d)[tonnetz[PCINT(chord.notes).value]] += chord.duration;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordOnset(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordOnset(Piece *p) {
   /*
   Bits representing which notes in a chord are onsets in ascending order. The lowest pitch is the LSB.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     uint64_t onset = 0;
-    for (int i=0; i<chord.notes.size(); i++) {
+    for (int i=0; i<(int)chord.notes.size(); i++) {
       if (chord.notes[i]->onset == chord.onset)
         onset |= (1 << i);
     }
@@ -242,21 +242,21 @@ std::unique_ptr<DISCRETE_DIST> ChordOnset(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordRange(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordRange(Piece *p) {
   /*
   The pitch range of notes in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
-    auto out = std::minmax_element(
+    auto out = minmax_element(
     chord.notes.begin(), chord.notes.end(), [](NOTE *a, NOTE *b){return a->pitch < b->pitch;});
-    (*d)[(*std::get<1>(out))->pitch - (*std::get<0>(out))->pitch]++;
+    (*d)[(*get<1>(out))->pitch - (*get<0>(out))->pitch]++;
   }
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordDissonance(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> ChordDissonance(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     if (chord.onset_notes.size() >= 2) {
       double periodicity = 0;
@@ -280,8 +280,8 @@ std::unique_ptr<DISCRETE_DIST> ChordDissonance(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranDissonance(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> ChordTranDissonance(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int k=0; k<(int)p->chords.size()-1; k++) {
     if ((p->chords[k].notes.size() >= 2) && (p->chords[k+1].notes.size() >= 2)) {
       double periodicity = 0;
@@ -305,11 +305,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranDissonance(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordLowestInterval(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordLowestInterval(Piece *p) {
   /*
   The interval between the lowest two pitches in a chord.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
     if (chord.notes.size() > 1) {
       (*d)[chord.notes[1]->pitch - chord.notes[0]->pitch]++;
@@ -319,8 +319,8 @@ std::unique_ptr<DISCRETE_DIST> ChordLowestInterval(Piece *p) {
 }
 
 // 3 does not work very well
-std::unique_ptr<DISCRETE_DIST> ChordSizeNgram(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> ChordSizeNgram(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size() - 2; i++) {
     (*d)[NOMINAL_TUPLE(p->chords[i].notes.size(), p->chords[i+1].notes.size(), p->chords[i+2].notes.size()).value]++; 
   }
@@ -334,11 +334,11 @@ enum class VOICE_MOTION_TYPE : uint64_t {
   CONTRARY_MOTION,
 };
 
-std::unique_ptr<DISCRETE_DIST> ChordTranVoiceMotion(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranVoiceMotion(Piece *p) {
   /*
   The outer voice motion between two successive chords.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     int md = sgn(p->chords[i+1].notes.back()->pitch - p->chords[i].notes.back()->pitch);
     int bd = sgn(p->chords[i+1].notes[0]->pitch - p->chords[i].notes[0]->pitch);
@@ -361,11 +361,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranVoiceMotion(Piece *p) {
 }
 
 // THIS IS REALLY BAD
-std::unique_ptr<DISCRETE_DIST> ChordTranRepeat(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranRepeat(Piece *p) {
   /*
   The frequency of complete chord repetition.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     bool allOnsets = true;
     for (const auto &note : p->chords[i+1].notes) {
@@ -386,11 +386,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranRepeat(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranScaleDistance(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranScaleDistance(Piece *p) {
   /*
   The distance in scale space between two successive chords.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     int a = PCINT(p->chords[i].notes).value;
     int b = PCINT(p->chords[i+1].notes).value;
@@ -404,11 +404,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranScaleDistance(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranScaleUnion(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranScaleUnion(Piece *p) {
   /*
   The distance in scale space between two successive chords.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     int a = PCINT(p->chords[i].notes).value;
     int b = PCINT(p->chords[i+1].notes).value;
@@ -422,11 +422,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranScaleUnion(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranDistance(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranDistance(Piece *p) {
   /*
   The distance between the highest and lowest notes in successive chords
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     int md = abs(p->chords[i+1].notes.back()->pitch - p->chords[i].notes.back()->pitch);
     int bd = abs(p->chords[i+1].notes[0]->pitch - p->chords[i].notes[0]->pitch);
@@ -435,11 +435,11 @@ std::unique_ptr<DISCRETE_DIST> ChordTranDistance(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranOuter(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranOuter(Piece *p) {
   /*
   The pitch class transition using only the outer notes.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size()-1; i++) {
     if ((p->chords[i+1].notes.front()->onset == p->chords[i+1].onset) || (p->chords[i+1].notes.back()->onset == p->chords[i+1].onset)) {
       int a = mod(p->chords[i].notes.back()->pitch - p->chords[i].notes.front()->pitch, 12);
@@ -451,12 +451,12 @@ std::unique_ptr<DISCRETE_DIST> ChordTranOuter(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranBassInterval(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranBassInterval(Piece *p) {
   /*
   The absolute interval between the lowest note in successive chords.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  std::vector<int> bass;
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  vector<int> bass;
   for (const auto &chord : p->chords) {
     if (chord.notes.front()->onset == chord.onset) {
       bass.push_back(chord.notes.front()->pitch);
@@ -468,12 +468,12 @@ std::unique_ptr<DISCRETE_DIST> ChordTranBassInterval(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordTranMelodyInterval(Piece *p) {
+unique_ptr<DISCRETE_DIST> ChordTranMelodyInterval(Piece *p) {
   /*
   The absolute interval between the highest notes in successive chords.
   */
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  std::vector<int> melody;
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  vector<int> melody;
   for (const auto &chord : p->chords) {
     if (chord.notes.back()->onset == chord.onset) {
       melody.push_back(chord.notes.back()->pitch);
@@ -486,9 +486,9 @@ std::unique_ptr<DISCRETE_DIST> ChordTranMelodyInterval(Piece *p) {
   return d;
 }
 
-std::unique_ptr<DISCRETE_DIST> ChordMelodyNgram(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  std::vector<int> melody;
+unique_ptr<DISCRETE_DIST> ChordMelodyNgram(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  vector<int> melody;
   for (const auto &chord : p->chords) {
     if (chord.notes.back()->onset == chord.onset) {
       melody.push_back(chord.notes.back()->pitch);
@@ -511,8 +511,8 @@ uint64_t roll_to_min(uint64_t x, int n) {
   return min;
 }
 
-std::unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) {
-  auto d = std::unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->unique_onsets.size() - 2; i++) {
     auto c1 = p->findOverlapping(p->unique_onsets[i], p->unique_onsets[i+1]);
     auto c2 = p->findOverlapping(p->unique_onsets[i+1], p->unique_onsets[i+2]);

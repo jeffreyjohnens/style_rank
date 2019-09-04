@@ -1,6 +1,7 @@
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
+import os
 import setuptools
 
 class get_pybind_include(object):
@@ -16,6 +17,7 @@ class get_pybind_include(object):
         import pybind11
         return pybind11.get_include(self.user)
 
+print("PATH :: ", os.path.realpath(__file__))
 
 ext_modules = [
     Extension(
