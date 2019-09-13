@@ -23,10 +23,10 @@ hpp_paths = [p for p in all_paths if p.endswith(".hpp") or p.endswith(".h")]
 # automatically get the requirements
 call(["pipreqs", "./src/style_rank", "--force"])
 with open("./src/style_rank/requirements.txt", "r") as f:
-  install_requires = [" ".join(l.split()) for l in f.readlines()]
+  install_requires = [" ".join(l.split()).replace("==",">=") for l in f.readlines()]
 install_requires += ['pybind11>=2.3']
 
-version_number = 9
+version_number = 12
 
 content = {
   "URL" : "'https://github.com/jeffreyjohnens/style_rank'",
@@ -43,12 +43,9 @@ create_from_template("setup_TEMPLATE.py", "setup.py", content)
 # clean dist and build
 call(["rm", "-rf", "dist"])
 call(["python3", "setup.py", "sdist"])
-
 #call(["twine", "upload", "dist/*"])
-#exit()
-
 
 # test the build ... will show all warnings
-call(["pip3", "uninstall", "style_rank", "-y"])
-call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
-call(["pip3", "install", "-vvv", "-e", "style_rank-1.0.{}".format(version_number)])
+#call(["pip3", "uninstall", "style_rank", "-y"])
+#call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
+#call(["pip3", "install", "-vvv", "-e", "style_rank-1.0.{}".format(version_number)])

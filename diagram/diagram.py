@@ -108,8 +108,6 @@ def use(name):
     dwg.add(dwg.text("B", x=[875], y=[560], font_size=20, style=style, fill=dark_color))
     dwg.add(dwg.text("C", x=[1095], y=[560], font_size=20, style=style,fill=dark_color))
 
-    #dwg.add(dwg.text.TextArea("In section A, each Random Forest classifier is trained to discriminate between generated musical excerpts (G0,G1,...) and a curated collection of musical excerpts (C0,C1,...) given a specific feature based representation (F1,F2). Concretely, the Random Forest classifier is trained to output 0 when provided a generated input and 1 otherwise.", insert=(80,600), size=(900,200), font_size=10, style=style, fill=dark_color))
-
     dwg.save()
 
 if __name__ == '__main__':

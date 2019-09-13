@@ -3,6 +3,7 @@ import os
 import csv
 import numpy as np
 import warnings
+from scipy.stats import rankdata
 from subprocess import call
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics.pairwise import cosine_distances
@@ -10,6 +11,9 @@ from sklearn.preprocessing import OneHotEncoder
 
 # import c++ code
 from ._style_rank import get_features_internal, get_feature_names
+
+# TODO : comments in the api
+# TODO : change interface to corpus_paths, to_be_ranked_paths
 
 def filter_valid_paths(paths):
   valid_paths = []
@@ -60,3 +64,11 @@ def get_distance_matrix(paths, labels, data=None, upper_bound=500):
     dist_mat.append( cosine_distances(embedded) )
   return np.mean(np.array(dist_mat),axis=0), indices
 
+def get_ranks(paths, labels, data=None, upper_bound=500):
+  # how to test this function ?
+  dmat,indices = get_distance_matrix(paths, labels, data=data, upper_bound=upper_bound)
+  labels = np.array(labels)[indices]
+  paths = np.array(paths)[indices]
+  dists = dmat[labels==0][:,labels==1].sum(1)
+  ranks = rankdata(dists, method="dense")
+  return {path : rank for path, rank in zip(ranks,paths[labels==0])}

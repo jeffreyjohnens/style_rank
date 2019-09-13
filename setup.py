@@ -1,7 +1,6 @@
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 import sys
-import os
 import setuptools
 
 class get_pybind_include(object):
@@ -17,7 +16,6 @@ class get_pybind_include(object):
         import pybind11
         return pybind11.get_include(self.user)
 
-print("PATH :: ", os.path.realpath(__file__))
 
 ext_modules = [
     Extension(
@@ -97,7 +95,7 @@ class BuildExt(build_ext):
 
 setup(
     name='style_rank',
-    version='1.0.9',
+    version='1.0.12',
     author='Jeff Ens',
     author_email='jeffreyjohnens@gmail.com',
     url='https://github.com/jeffreyjohnens/style_rank',
@@ -106,7 +104,7 @@ setup(
     ext_modules=ext_modules,
     package_dir = {'': 'src'},
     packages = ['style_rank'],
-    install_requires=['numpy==1.15.1', 'scikit_learn==0.21.2', 'pybind11>=2.3'],
+    install_requires=['numpy>=1.17.0', 'scikit_learn>=0.21.3', 'pybind11>=2.3'],
     setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,
