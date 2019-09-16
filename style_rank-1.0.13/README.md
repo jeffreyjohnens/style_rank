@@ -1,6 +1,6 @@
 # StyleRank
 
-StyleRank is a method to rank MIDI files based on their similarity to an arbitrary musical style delineated by a collection of MIDI files. MIDI files are encoded using a novel set of features and an embedding is learned using Random Forests.
+StyleRank is a method to measure the similarity between a MIDI file and an arbitrary musical style delineated by a collection of MIDI files. MIDI files are encoded using a novel set of features and an embedding is learned using Random Forests.
 
 ## Getting Started
 
@@ -8,12 +8,6 @@ StyleRank is a method to rank MIDI files based on their similarity to an arbitra
 
 ```python
 pip install style_rank
-```
-
-### Basic Examples
-
-```python
-from style_rank import rank
 ```
 
 ## Built With

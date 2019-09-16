@@ -26,7 +26,7 @@ with open("./src/style_rank/requirements.txt", "r") as f:
   install_requires = [" ".join(l.split()).replace("==",">=") for l in f.readlines()]
 install_requires += ['pybind11>=2.3']
 
-version_number = 12
+version_number = 13
 
 content = {
   "URL" : "'https://github.com/jeffreyjohnens/style_rank'",
@@ -46,6 +46,6 @@ call(["python3", "setup.py", "sdist"])
 #call(["twine", "upload", "dist/*"])
 
 # test the build ... will show all warnings
-#call(["pip3", "uninstall", "style_rank", "-y"])
-#call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
-#call(["pip3", "install", "-vvv", "-e", "style_rank-1.0.{}".format(version_number)])
+call(["pip3", "uninstall", "style_rank", "-y"])
+call(["tar", "-xf", "./dist/style_rank-1.0.{}.tar.gz".format(version_number)])
+call(["pip3", "install", "-vvv", "-e", "style_rank-1.0.{}".format(version_number)])
