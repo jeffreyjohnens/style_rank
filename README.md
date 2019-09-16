@@ -14,6 +14,10 @@ pip install style_rank
 
 ```python
 from style_rank import rank
+to_rank_paths = ["in_style.mid", "out_of_style.mid", "somewhat_in_style.mid"]
+corpus_paths = ["corpus_1.mid", "corpus_2.mid", "corpus_3.mid"]
+rank(to_rank, corpus)
+>>> ["in_style.mid", "somewhat_in_style.mid", "out_of_style.mid"]
 ```
 
 ## Built With
