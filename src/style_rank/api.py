@@ -87,7 +87,7 @@ def get_feature_csv(paths, output_dir, upper_bound=500, feature_names=[]):
     feature_names (list): a list of features to extract
   """
   data, domains, indices = get_features(
-    paths, upper_bound=upper_bound, features_names=features_names)
+    paths, upper_bound=upper_bound, feature_names=feature_names)
   call(["mkdir", "-p", output_dir])
   for k,v in data.items():
     with open(os.path.join(output_dir, k) + ".csv", "w") as f:
