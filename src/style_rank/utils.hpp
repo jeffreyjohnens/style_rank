@@ -1,20 +1,15 @@
 #ifndef STYLE_RANK_UTILS_H
 #define STYLE_RANK_UTILS_H
 
-#include <string>
 #include <vector>
 #include <numeric>
 #include <sstream>
-#include <assert.h>
 #include <iostream>
-#include <vector>
 #include <string>
 #include <set>
 #include <map>
 #include <unordered_map>
-#include <sstream>
-#include <numeric>
-#include <sstream>
+#include <algorithm>
 #include <assert.h>
 
 // macro for suppressing std::cout and std::cerr

@@ -5,6 +5,9 @@
 #include "pcd.hpp"
 #include <cmath>
 
+#include "libpopcnt.h"
+#include <assert.h>
+
 using namespace std;
 
 int lcm(int a, int b) {
@@ -398,7 +401,10 @@ unique_ptr<DISCRETE_DIST> ChordTranScaleDistance(Piece *p) {
       (*d)[100]++;
     }
     else {
-      (*d)[__builtin_popcount(pcscale[a] ^ pcscale[b])]++;
+      uint64_t data = (pcscale[a] ^ pcscale[b]);
+      (*d)[popcnt(&data, sizeof(uint64_t))]++;
+      //assert(popcnt(&data, sizeof(uint64_t)) == __builtin_popcount(pcscale[a] ^ pcscale[b])); 
+      //(*d)[__builtin_popcount(pcscale[a] ^ pcscale[b])]++;
     }
   }
   return d;
@@ -416,7 +422,10 @@ unique_ptr<DISCRETE_DIST> ChordTranScaleUnion(Piece *p) {
       (*d)[100]++;
     }
     else {
-      (*d)[__builtin_popcount(pcscale[a] | pcscale[b])]++;
+      uint64_t data = (pcscale[a] | pcscale[b]);
+      (*d)[popcnt(&data, sizeof(uint64_t))]++;
+      //assert(popcnt(&data, sizeof(uint64_t)) == __builtin_popcount(pcscale[a] | pcscale[b]));
+      //(*d)[__builtin_popcount(pcscale[a] | pcscale[b])]++;
     }
   }
   return d;

@@ -26,7 +26,7 @@ ext_modules = [
             get_pybind_include(),
             get_pybind_include(user=True)
         ],
-        depends=['src/style_rank/features.hpp', 'src/style_rank/feature_map_template.hpp', 'src/style_rank/feature_map.hpp', 'src/style_rank/pcd.hpp', 'src/style_rank/utils.hpp', 'src/style_rank/parse.hpp', 'src/style_rank/deps/MidiEvent.h', 'src/style_rank/deps/MidiFile.h', 'src/style_rank/deps/MidiEventList.h', 'src/style_rank/deps/Binasc.h', 'src/style_rank/deps/MidiMessage.h'],
+        #headers=['src/style_rank/features.hpp', 'src/style_rank/feature_map_template.hpp', 'src/style_rank/feature_map.hpp', 'src/style_rank/pcd.hpp', 'src/style_rank/libpopcnt.h', 'src/style_rank/utils.hpp', 'src/style_rank/parse.hpp', 'src/style_rank/deps/MidiEvent.h', 'src/style_rank/deps/MidiFile.h', 'src/style_rank/deps/MidiEventList.h', 'src/style_rank/deps/Binasc.h', 'src/style_rank/deps/MidiMessage.h'],
         language='c++'
     ),
 ]
@@ -95,7 +95,7 @@ class BuildExt(build_ext):
 
 setup(
     name='style_rank',
-    version='1.0.15',
+    version='1.0.18',
     author='Jeff Ens',
     author_email='jeffreyjohnens@gmail.com',
     url='https://github.com/jeffreyjohnens/style_rank',

@@ -26,7 +26,7 @@ ext_modules = [
             get_pybind_include(),
             get_pybind_include(user=True)
         ],
-        depends=$HPP_PATHS,
+        #headers=$HPP_PATHS,
         language='c++'
     ),
 ]

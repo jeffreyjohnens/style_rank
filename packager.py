@@ -33,7 +33,7 @@ if __name__ == "__main__":
     install_requires = [" ".join(l.split()).replace("==",">=") for l in f.readlines()]
   install_requires += ['pybind11>=2.3']
 
-  version_number = 16
+  version_number = 18
 
   content = {
     "URL" : "'https://github.com/jeffreyjohnens/style_rank'",
@@ -48,7 +48,8 @@ if __name__ == "__main__":
   create_from_template("setup_TEMPLATE.py", "setup.py", content)
 
   # clean dist and build
-  call(["rm", "-rf", "dist"])
+  call("rm -rf dist", shell=True)
+  call("rm -rf build", shell=True)
   call(["python3", "setup.py", "sdist"])
 
   # test the build ... will show all warnings

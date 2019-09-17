@@ -23,6 +23,4 @@ try:
 except Exception as e:
   print(e)
 
-
-
 print( rank(to_rank, corpus) )
