@@ -104,7 +104,7 @@ setup(
     ext_modules=ext_modules,
     package_dir = {'': 'src'},
     packages = ['style_rank'],
-    install_requires=['scipy>=1.1.0', 'numpy>=1.17.0', 'scikit_learn>=0.21.3', 'pybind11>=2.3'],
+    install_requires=['numpy>=1.17.0', 'scipy>=1.1.0', 'scikit_learn>=0.21.3', 'pybind11>=2.3'],
     setup_requires=['pybind11>=2.3'],
     cmdclass={'build_ext': BuildExt},
     zip_safe=False,

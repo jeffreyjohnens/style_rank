@@ -13,11 +13,17 @@ pip install style_rank
 ### Basic Examples
 
 ```python
+# rank 3 midi files with respect to a style delineated by 3 midi files
 from style_rank import rank
 to_rank_paths = ["in_style.mid", "out_of_style.mid", "somewhat_in_style.mid"]
 corpus_paths = ["corpus_1.mid", "corpus_2.mid", "corpus_3.mid"]
 rank(to_rank, corpus)
 >>> ["in_style.mid", "somewhat_in_style.mid", "out_of_style.mid"]
+
+# get a list of all the features
+from style_rank import get_feature_names
+get_feature_names()
+>>> ['ChordMelodyNgram', 'ChordTranDistance', 'ChordTranVoiceMotion', 'ChordSizeNgram', 'ChordShape', 'ChordDissonance', 'ChordRange', 'ChordOnsetTiePCD', 'ChordOnsetTiePCDTogether', 'PCDTran', 'ChordTranOuter', 'ChordTranDissonance', 'ChordTranBassInterval', 'ChordOnsetPCD', 'ChordTranScaleDistance', 'ChordLowestInterval', 'ChordPCDWBass', 'ChordTranScaleUnion', 'ChordPCD', 'ChordDuration', 'ChordTonnetz', 'ChordPCSizeRatio', 'ChordOnsetRatio', 'ChordTranRepeat', 'ChordTranMelodyInterval', 'ChordSize', 'ChordOnsetShape', 'ChordOnset', 'ChordDistinctDurationRatio', 'IntervalClassDist', 'IntervalDist']
 ```
 
 ## Built With
