@@ -23,7 +23,7 @@ rank(to_rank, corpus)
 # get a list of all the features
 from style_rank import get_feature_names
 get_feature_names()
->>> ['ChordMelodyNgram', 'ChordTranDistance', 'ChordTranVoiceMotion', 'ChordSizeNgram', 'ChordShape', 'ChordDissonance', 'ChordRange', 'ChordOnsetTiePCD', 'ChordOnsetTiePCDTogether', 'PCDTran', 'ChordTranOuter', 'ChordTranDissonance', 'ChordTranBassInterval', 'ChordOnsetPCD', 'ChordTranScaleDistance', 'ChordLowestInterval', 'ChordPCDWBass', 'ChordTranScaleUnion', 'ChordPCD', 'ChordDuration', 'ChordTonnetz', 'ChordPCSizeRatio', 'ChordOnsetRatio', 'ChordTranRepeat', 'ChordTranMelodyInterval', 'ChordSize', 'ChordOnsetShape', 'ChordOnset', 'ChordDistinctDurationRatio', 'IntervalClassDist', 'IntervalDist']
+>>> ['ChordMelodyNgram', 'ChordTranDistance', ..., 'IntervalClassDist', 'IntervalDist']
 ```
 
 ## Built With
