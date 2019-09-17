@@ -28,12 +28,12 @@ if __name__ == "__main__":
   hpp_paths = [p for p in all_paths if p.endswith(".hpp") or p.endswith(".h")]
 
   # automatically get the requirements
-  call(["pipreqs", "./src/style_rank", "--force"])
+  #call(["pipreqs", "./src/style_rank", "--force"])
   with open("./src/style_rank/requirements.txt", "r") as f:
     install_requires = [" ".join(l.split()).replace("==",">=") for l in f.readlines()]
   install_requires += ['pybind11>=2.3']
 
-  version_number = 15
+  version_number = 16
 
   content = {
     "URL" : "'https://github.com/jeffreyjohnens/style_rank'",

@@ -11,6 +11,7 @@ StyleRank is a method to rank MIDI files based on their similarity to an arbitra
 Python2 is not supported. Python>=3.6.5 is supported.
 
 ```python
+pip install pybind11
 pip install style_rank
 ```
 
