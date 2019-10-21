@@ -11,6 +11,10 @@
 
 using namespace std;
 
+// TODO : make a python script that converts partially specified
+// features i.e. except a vector<CHORD> into fully specified features
+// to accept a piece process different types of onset or onset
+
 int lcm(int a, int b) {
   int max = (a > b) ? a : b;
   while(true) {
