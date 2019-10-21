@@ -25,18 +25,21 @@ int quantize(int x, int ticks_per_beat, int resolution) {
 
 class NOTE {
 public:
-	int pitch, duration, velocity, onset, end;
-	NOTE(int _pitch, int _onset, int _duration, int _velocity) {
-		assert(_pitch >= 0);
-		assert(_pitch < 128);
-		assert(_duration > 0);
-		assert(_onset >= 0);
-        assert(_velocity >= 0);
-		pitch = _pitch;
-		duration = _duration;
-		velocity = _velocity;
-		onset = _onset;
-		end = _onset + _duration;
+	int pitch, duration, velocity, onset, end, qduration, qonset, qend;
+	NOTE(int pit, int ons, int dur, int vel, int qdur, int qons) {
+		assert(pit >= 0);
+		assert(pit < 128);
+		assert(dur > 0);
+		assert(ons >= 0);
+		assert(vel >= 0);
+		pitch = pit;
+		duration = dur;
+		velocity = vel;
+		onset = ons;
+		end = ons + dur;
+		qduration = qdur;
+		qonset = qons;
+		qend = qdur + qons;
 	}
 };
 
@@ -105,7 +108,7 @@ public:
 	int max_duration;
 	int r;
 
-    // this is for for testing
+  // this is for for testing
 	Piece (vector<array<int,3>> &notes) {
 		max_duration = 0;
 		ticks = 1;
@@ -140,13 +143,9 @@ public:
 					onset = midifile[track][event].tick;
 					assert(onset >= 0);
 
-                    if (duration > max_duration) {
-			            max_duration = duration;
-		            }
-
-					// quantization
-					//duration = quantize(duration, ticks, resolution);
-					//onset = quantize(onset, ticks, resolution);
+          if (duration > max_duration) {
+			    	max_duration = duration;
+		      }
 
 					addNote(pitch, onset, duration, velocity);
 				}
@@ -159,8 +158,13 @@ public:
 
 	void addNote(int pitch, int onset, int duration, int velocity=100) {
 		if (duration <= 0) return;
+
+		// quantization
+		int qduration = quantize(duration, ticks, r);
+		int qonset = quantize(onset, ticks, r);
+
 		notes.push_back( 
-            unique_ptr<NOTE>(new NOTE(pitch, onset, duration, velocity)) );
+      unique_ptr<NOTE>(new NOTE(pitch, onset, duration, velocity, qduration, qonset)));
 
 		unique_onsets_set.insert( onset );
 		unique_offsets_set.insert( onset + duration );	
@@ -178,12 +182,12 @@ public:
 
 		copy(unique_offsets_set.begin(), unique_offsets_set.end(), back_inserter(unique_offsets));
 
-        // add the last offset
+    // add the last offset
 		unique_onsets.push_back(unique_offsets.back());
 
 		for (int i=0; i<(int)unique_onsets.size() - 1; i++) {
-            int duration = unique_onsets[i+1] - unique_onsets[i];
-            auto notes = findOverlapping(unique_onsets[i], unique_onsets[i+1]);
+      int duration = unique_onsets[i+1] - unique_onsets[i];
+      auto notes = findOverlapping(unique_onsets[i], unique_onsets[i+1]);
 			auto chord = CHORD(notes, duration, unique_onsets[i]);
     	    chords.push_back( chord );
 		}

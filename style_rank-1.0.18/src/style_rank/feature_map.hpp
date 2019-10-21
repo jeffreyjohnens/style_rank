@@ -44,7 +44,11 @@ static std::unordered_map<std::string, std::unique_ptr<DISCRETE_DIST>(*)(Piece*)
 	{ "DurationDifference", &DurationDifference},
 	{ "OnsetDifference", &OnsetDifference},
 	{ "Onset", &Onset},
-	{ "Duration", &Duration}
+	{ "Duration", &Duration},
+	{ "ChordOnsetDifference", &ChordOnsetDifference},
+	{ "Pitch", &Pitch},
+	{ "ChordOuterInterval", &ChordOuterInterval},
+	{ "ChordDistance", &ChordDistance}
 };
 
 #endif

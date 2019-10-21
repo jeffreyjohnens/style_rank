@@ -26,7 +26,7 @@ ext_modules = [
             get_pybind_include(),
             get_pybind_include(user=True)
         ],
-        #headers=['src/style_rank/features.hpp', 'src/style_rank/feature_map_template.hpp', 'src/style_rank/feature_map.hpp', 'src/style_rank/pcd.hpp', 'src/style_rank/libpopcnt.h', 'src/style_rank/utils.hpp', 'src/style_rank/parse.hpp', 'src/style_rank/deps/MidiEvent.h', 'src/style_rank/deps/MidiFile.h', 'src/style_rank/deps/MidiEventList.h', 'src/style_rank/deps/Binasc.h', 'src/style_rank/deps/MidiMessage.h'],
+        #headers=['src/style_rank/features.hpp', 'src/style_rank/zip.hpp', 'src/style_rank/feature_map_template.hpp', 'src/style_rank/feature_map.hpp', 'src/style_rank/pcd.hpp', 'src/style_rank/libpopcnt.h', 'src/style_rank/utils.hpp', 'src/style_rank/parse.hpp', 'src/style_rank/deps/MidiEvent.h', 'src/style_rank/deps/MidiFile.h', 'src/style_rank/deps/MidiEventList.h', 'src/style_rank/deps/Binasc.h', 'src/style_rank/deps/MidiMessage.h'],
         language='c++'
     ),
 ]

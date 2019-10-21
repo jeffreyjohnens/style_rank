@@ -2,6 +2,7 @@
 #define STYLE_RANK_FEATURES_H
 
 #include "utils.hpp"
+#include "zip.hpp"
 #include "pcd.hpp"
 #include <cmath>
 
@@ -552,7 +553,7 @@ def offset_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> OffsetDistrubution(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp((note->onset + note->duration) % (p->r*16), 0, p->r*16)]++;
+    (*d)[clamp(mod(note->qend, p->r*16), 0, p->r*16)]++;
   }
   return d;
 }
@@ -577,7 +578,7 @@ def duration_difference_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> DurationDifference(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->duration - p->notes[i]->duration, -1*p->r*16, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->qduration - p->notes[i]->qduration, -1*p->r*16, p->r*16)];
   }
   return d;
 }
@@ -591,7 +592,7 @@ def onset_difference_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> OnsetDifference(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->onset - p->notes[i]->onset, 0, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->qonset - p->notes[i]->qonset, 0, p->r*16)];
   }
   return d;
 }
@@ -604,7 +605,7 @@ def onset_distrubution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Onset(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(mod(note->onset, p->r*4), 0, p->r*4)];
+    (*d)[clamp(mod(note->qonset, p->r*4), 0, p->r*4)];
   }
   return d;
 }
@@ -617,10 +618,11 @@ def duration_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Duration(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(note->duration, 0, p->r*16)];
+    (*d)[clamp(note->qduration, 0, p->r*16)];
   }
   return d;
 }
+
 
 /*
 @feature
@@ -635,6 +637,134 @@ def melodic_ngram_pcd(p, resolution=8):
   return d;
 }
 */
+
+///////////////////////////////////////////////////////////////////////
+// polyphony
+
+/*
+@feature
+def offset_distribution(p, resolution=8):
+  return count((p.onsets + p.durations) % (resolution*16), max=resolution*16)
+*/
+
+/*
+@feature
+def chord_onset_difference_distribution(p, resolution=8):
+  return count(np.diff(p.segments) + 128, max=256)
+*/
+unique_ptr<DISCRETE_DIST> ChordOnsetDifference(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &it : zipper<CHORD>(p->chords)) {
+    (*d)[it.second.onset - it.first.onset]++;
+  }
+  return d;
+}
+
+
+/*
+@feature
+def pitch_distribution(p, resolution=8):
+  return count(p.pitches, max=128)
+*/
+unique_ptr<DISCRETE_DIST> Pitch(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &note : p->notes) {
+    (*d)[note->pitch]++;
+  }
+  return d;
+}
+
+
+/*
+@feature
+def chord_onset_structure(p, resolution=8):
+  return count([(c*(2**np.arange(len(c)))).sum() for c in p.chord_onsets], max=2**8)
+*/
+// ALREADY IMPLEMENTED
+
+
+/*
+@feature
+def chord_onset_structure_weighted(p, resolution=8):
+  return count([(c*(2**np.arange(len(c)))).sum() for c in p.chord_onsets], weights=p.chord_durs, max=2**8)
+*/
+// ALREADY IMPLEMENTED
+
+/*
+@feature
+def chord_pcd(p, resolution=8):
+  return count([pcd[toInt(c)] for c in p.chords], max=352)
+*/
+// ALREADY IMPLEMENTED
+
+/*
+@feature
+def chord_pcd_weighted(p, resolution=8):
+  return count([pcd[toInt(c)] for c in p.chords], weights=p.chord_durs, max=352)
+*/
+// ALREADY IMPLEMENTED
+
+/*
+@feature
+def chord_size_duration_weighted(p, resolution=8):
+  return count([len(c) for c in p.chords], weights=p.chord_durs, max=12)
+*/
+// ALREADY IMPLEMENTED
+
+/*
+@feature
+def chord_size(p, resolution=8):
+  return count([len(c) for c in p.chords], max=12)
+*/
+// ALREADY IMPLEMENTED
+
+/*
+@feature
+def chord_outer_interval(p, resolution=8):
+  return count([np.max(c)-np.min(c) % 12 if len(c) else 0 for c in p.chords], weights=p.chord_durs, max=12)
+*/
+unique_ptr<DISCRETE_DIST> ChordOuterInterval(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &chord : p->chords) {
+    (*d)[mod(chord.notes.back()->pitch - chord.notes[0]->pitch, 12)]++;
+  }
+  return d;
+}
+
+/*
+@feature
+def chord_distance(p, resolution=8):
+  non_empty_chords = [c for c in p.chords if len(c)]
+  dist = []
+  D = 25
+  for a,b in zip(non_empty_chords, non_empty_chords[1:]):
+    inter = len(set(list(a)).intersection(set(list(b))))
+    union = len(set(list(a)).union(set(list(b))))
+    dist.append( int(np.round(float(inter) / union * (D-1))) )
+  return count(dist, max=D)
+*/
+unique_ptr<DISCRETE_DIST> ChordDistance(Piece *p) {
+  int N = 25;
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &it : zipper<CHORD>(p->chords)) {
+    float set_inter = 0;
+    float set_union = 0;
+    std::map<int,int> counts;
+    for (const auto &note : it.first.notes) {
+      counts[note->pitch] = 1;
+    }
+    for (const auto &note : it.second.notes) {
+      counts[note->pitch]++;
+    }
+    for (const auto &kv : counts) {
+      set_union += (int)(kv.second == 1);
+      set_inter += (int)(kv.second > 1);
+    }
+    (*d)[(int)(set_inter / set_union * (N-1))]++;
+  }
+  return d;
+}
+
 
 
 #endif
