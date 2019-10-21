@@ -636,5 +636,58 @@ def melodic_ngram_pcd(p, resolution=8):
 }
 */
 
+/*
+@feature
+def offset_distribution(p, resolution=8):
+  return count((p.onsets + p.durations) % (resolution*16), max=resolution*16)
+
+@feature
+def chord_onset_difference_distribution(p, resolution=8):
+  return count(np.diff(p.segments) + 128, max=256)
+
+@feature
+def pitch_distribution(p, resolution=8):
+  return count(p.pitches, max=128)
+
+@feature
+def chord_onset_structure(p, resolution=8):
+  return count([(c*(2**np.arange(len(c)))).sum() for c in p.chord_onsets], max=2**8)
+
+@feature
+def chord_onset_structure_weighted(p, resolution=8):
+  return count([(c*(2**np.arange(len(c)))).sum() for c in p.chord_onsets], weights=p.chord_durs, max=2**8)
+
+@feature
+def chord_pcd(p, resolution=8):
+  return count([pcd[toInt(c)] for c in p.chords], max=352)
+
+@feature
+def chord_pcd_weighted(p, resolution=8):
+  return count([pcd[toInt(c)] for c in p.chords], weights=p.chord_durs, max=352)
+
+@feature
+def chord_size_duration_weighted(p, resolution=8):
+  return count([len(c) for c in p.chords], weights=p.chord_durs, max=12)
+
+@feature
+def chord_size(p, resolution=8):
+  return count([len(c) for c in p.chords], max=12)
+
+@feature
+def chord_outer_interval(p, resolution=8):
+  return count([np.max(c)-np.min(c) % 12 if len(c) else 0 for c in p.chords], weights=p.chord_durs, max=12)
+
+@feature
+def chord_distance(p, resolution=8):
+  non_empty_chords = [c for c in p.chords if len(c)]
+  dist = []
+  D = 25
+  for a,b in zip(non_empty_chords, non_empty_chords[1:]):
+    inter = len(set(list(a)).intersection(set(list(b))))
+    union = len(set(list(a)).union(set(list(b))))
+    dist.append( int(np.round(float(inter) / union * (D-1))) )
+  return count(dist, max=D)
+*/
+
 
 #endif
