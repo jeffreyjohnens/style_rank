@@ -530,4 +530,111 @@ unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) {
   return d;
 }
 
+// TODO : make two chord sequences
+// one based on onsets and another based on offsets
+// new functions based on the stuff
+// TODO : need to allow for quantization in notes
+// TODO : test out clamp
+
+unique_ptr<DISCRETE_DIST> ChordSizeDurationWeighted(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &chord : p->chords) {
+    (*d)[chord.notes.size()] += chord.duration;
+  }
+  return d;
+}
+
+/*
+@feature
+def offset_distribution(p, resolution=8):
+  return count((p.onsets + p.durations) % (resolution*16), max=resolution*16)
+*/
+unique_ptr<DISCRETE_DIST> OffsetDistrubution(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &note : p->notes) {
+    (*d)[clamp((note->onset + note->duration) % (p->r*16), 0, p->r*16)]++;
+  }
+  return d;
+}
+
+/*@feature
+def interval_distribution(p, resolution=8):
+  return count(np.diff(p.pitches) + 128, max=256)
+*/
+unique_ptr<DISCRETE_DIST> MelodicInterval(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (int i=0; i<(int)p->notes.size()-1; i++) {
+    (*d)[clamp((p->notes[i+1]->pitch - p->notes[i]->pitch), -128, 128)];
+  }
+  return d;
+}
+
+
+/*@feature
+def duration_difference_distribution(p, resolution=8):
+  return count(np.diff(p.durations) + resolution*16, max=resolution*32)
+*/
+unique_ptr<DISCRETE_DIST> DurationDifference(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (int i=0; i<(int)p->notes.size()-1; i++) {
+    (*d)[clamp(p->notes[i+1]->duration - p->notes[i]->duration, -1*p->r*16, p->r*16)];
+  }
+  return d;
+}
+
+
+/*
+@feature
+def onset_difference_distribution(p, resolution=8):
+  return count(np.diff(p.onsets), max=resolution*16)
+*/
+unique_ptr<DISCRETE_DIST> OnsetDifference(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (int i=0; i<(int)p->notes.size()-1; i++) {
+    (*d)[clamp(p->notes[i+1]->onset - p->notes[i]->onset, 0, p->r*16)];
+  }
+  return d;
+}
+
+/*
+@feature
+def onset_distrubution(p, resolution=8):
+  return count(p.onsets % (resolution*4), max=resolution*4)
+*/
+unique_ptr<DISCRETE_DIST> Onset(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &note : p->notes) {
+    (*d)[clamp(mod(note->onset, p->r*4), 0, p->r*4)];
+  }
+  return d;
+}
+
+/*
+@feature
+def duration_distribution(p, resolution=8):
+  return count(p.durations, max=resolution*16)
+*/
+unique_ptr<DISCRETE_DIST> Duration(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &note : p->notes) {
+    (*d)[clamp(note->duration, 0, p->r*16)];
+  }
+  return d;
+}
+
+/*
+@feature
+def melodic_ngram_pcd(p, resolution=8):
+  return count([pcd[toInt(_)] for _ in window(p.pitches,4)], max=352)
+*/
+/*uNOnique_ptr<DISCRETE_DIST> MelodicNGramPCD(Piece *p) {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &note : p->notes) {
+    (*d)[clamp(note->duration, 0, p->r*16)];
+  }
+  return d;
+}
+*/
+
+
 #endif

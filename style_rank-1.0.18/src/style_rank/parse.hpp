@@ -103,6 +103,7 @@ public:
 	int ticks;
 	int track_count;
 	int max_duration;
+	int r;
 
     // this is for for testing
 	Piece (vector<array<int,3>> &notes) {
@@ -125,6 +126,7 @@ public:
 		track_count = midifile.getTrackCount();
 		ticks = midifile.getTicksPerQuarterNote();
 		max_duration = 0;
+		r = resolution;
 
 		int pitch, duration, velocity, onset;
 

@@ -2,6 +2,7 @@
 import os
 from subprocess import call
 from string import Template
+from create_feature_map_hpp import build_feature_map
 
 def create_from_template(template_path, output_path, content):
   with open(template_path) as template_file:
@@ -16,6 +17,18 @@ if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument('--mode', type=str, default="develop")
   args = parser.parse_args()
+
+  version_number = 18
+
+  # delete old stuff
+  call("pip3 uninstall style_rank -y", shell=True)
+  call("rm -rf style_rank-1.0.{}".format(version_number), shell=True)
+
+  # create the feature map
+  cwd = os.getcwd()
+  os.chdir("src/style_rank")
+  build_feature_map()
+  os.chdir(cwd)
 
   # get all the .cpp files
   all_paths = []
@@ -32,8 +45,6 @@ if __name__ == "__main__":
   with open("./src/style_rank/requirements.txt", "r") as f:
     install_requires = [" ".join(l.split()).replace("==",">=") for l in f.readlines()]
   install_requires += ['pybind11>=2.3']
-
-  version_number = 18
 
   content = {
     "URL" : "'https://github.com/jeffreyjohnens/style_rank'",

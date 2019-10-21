@@ -3,14 +3,11 @@ import re
 from string import Template
 from subprocess import call
 
-if __name__ == "__main__":
-  
+def build_feature_map():
   funcs = []
   with open("features.hpp", "r") as infile:
-    for line in infile.readlines():
-      if re.match(r'.*std::unique_ptr<DISCRETE_DIST>.*(.*Piece.*)', line):
-        funcs.append( 
-          line.split("std::unique_ptr<DISCRETE_DIST>")[1].split("(")[0].strip() )
+    for m in re.findall(r'unique_ptr<DISCRETE_DIST>(.+?)Piece', infile.read()):
+      funcs.append( "".join(m.split("(")[0].split()) )
   
   s = ",\n\t".join(['{ "' + name + '", &' + name + '}' for name in funcs])
 
@@ -19,3 +16,6 @@ if __name__ == "__main__":
       
   with open("feature_map.hpp", "w") as outfile:
     outfile.write(src.substitute({"FEATURE_MAP" : s}))
+
+if __name__ == "__main__":
+  build_feature_map()
