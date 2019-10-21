@@ -24,3 +24,5 @@ except Exception as e:
   print(e)
 
 print( rank(to_rank, corpus) )
+
+print( rank(to_rank, corpus, return_similarity=True))
