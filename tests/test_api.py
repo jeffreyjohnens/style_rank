@@ -28,4 +28,4 @@ except Exception as e:
 
 print( rank(to_rank, corpus) )
 
-print( rank(to_rank, corpus, return_similarity=True))
+print( rank(to_rank, corpus, return_similarity=True, resolution=8, include_offsets=True) )

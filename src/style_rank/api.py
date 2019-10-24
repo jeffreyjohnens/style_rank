@@ -59,7 +59,7 @@ def validate_paths(paths, list_name=None):
     raise Exception('No valid filepaths provided')
   return np.array(valid_paths), np.array(indices)
 
-def get_features(paths, upper_bound=500, feature_names=[]):
+def get_features(paths, upper_bound=500, feature_names=[], resolution=0, include_offsets=False):
   """extract features for a list of midis
   Args:
     paths (list): a list of midi filepaths.
@@ -72,13 +72,13 @@ def get_features(paths, upper_bound=500, feature_names=[]):
   """
   paths, path_indices = validate_paths(paths)
   feature_names = [f for f in feature_names if f in get_feature_names()]
-  (fs, domains, indices) = get_features_internal(paths, feature_names, upper_bound)
+  (fs, domains, indices) = get_features_internal(paths, feature_names, upper_bound, resolution, include_offsets)
   fs = {k : np.array(v).reshape(-1,len(domains[k])+1) for k,v in fs.items()}
   domains = {k : np.array(v) for k,v in domains.items()}
   path_indices = path_indices[np.array(indices)]
   return fs, domains, path_indices
 
-def get_feature_csv(paths, output_dir, upper_bound=500, feature_names=[]):
+def get_feature_csv(paths, output_dir, upper_bound=500, feature_names=[], resolution=0, include_offsets=False):
   """extract features for a list of midis and output to csv's
   Args:
     paths (list): a list of midi filepaths.
@@ -87,7 +87,7 @@ def get_feature_csv(paths, output_dir, upper_bound=500, feature_names=[]):
     feature_names (list): a list of features to extract
   """
   data, domains, indices = get_features(
-    paths, upper_bound=upper_bound, feature_names=feature_names)
+    paths, upper_bound=upper_bound, feature_names=feature_names, resolution=resolution, include_offsets=include_offsets)
   call(["mkdir", "-p", output_dir])
   for k,v in data.items():
     with open(os.path.join(output_dir, k) + ".csv", "w") as f:
@@ -113,7 +113,7 @@ def rf_embed(feature, labels, n_estimators=100, max_depth=3):
     OneHotEncoder(categories='auto').fit_transform(leaves).todense())
   return 1. - cosine_distances(embedded)
 
-def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False):
+def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False, resolution=0, include_offsets=False):
   """construct a distance matrix
   Args:
     to_rank_paths (list/np.ndarray): a list/array of midis to be ranked.
@@ -136,7 +136,7 @@ def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=
 
   # extract features
   if features is None:
-    features, _, indices = get_features(paths, upper_bound=upper_bound)
+    features, _, indices = get_features(paths, upper_bound=upper_bound, resolution=resolution, include_offsets=include_offsets)
     labels = labels[indices]
   else:
     validate_features(paths, labels, features)
@@ -156,7 +156,7 @@ def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=
     return dist_mat, paths[indices], labels
   return dist_mat
 
-def rank(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_similarity=False):
+def rank(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_similarity=False, resolution=0, include_offsets=False):
   """construct a distance matrix
   Args:
     to_rank_paths (list/np.ndarray): a list/array of midis to be ranked.
@@ -169,7 +169,7 @@ def rank(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimato
   Returns:
     paths (np.ndarray): an array containing the to_rank_paths sorted from most to least stylistically similar to the corpus.
   """
-  dmat,paths,labels = get_distance_matrix(to_rank_paths, corpus_paths, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, features=features)
+  dmat,paths,labels = get_distance_matrix(to_rank_paths, corpus_paths, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, features=features, resolution=resolution, include_offsets=include_offsets)
   dists = dmat[labels==0][:,labels==1].sum(1)
   order = np.argsort(dists)[::-1]
   if return_similarity:

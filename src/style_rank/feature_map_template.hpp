@@ -5,9 +5,15 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
+using namespace std;
 
-static std::unordered_map<std::string, std::unique_ptr<DISCRETE_DIST>(*)(Piece*)> m { 
+static unordered_map<string, unique_ptr<DISCRETE_DIST>(*)(Piece*)> m { 
     $FEATURE_MAP
+};
+
+static unordered_map<string, vector<string>> feature_tag_map { 
+    $FEATURE_TAG_MAP
 };
 
 #endif

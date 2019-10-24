@@ -117,7 +117,7 @@ public:
     findChords(include_offsets);
   }
 
-  Piece(string filepath, int resolution=0, bool skip_chords=false, bool include_offsets=false) {
+  Piece(string filepath, int resolution=0, bool include_offsets=false, bool skip_chords=false) {
 
     smf::MidiFile midifile;
     QUIET_CALL(midifile.read(filepath));

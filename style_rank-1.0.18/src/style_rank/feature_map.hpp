@@ -5,8 +5,10 @@
 
 #include <unordered_map>
 #include <string>
+#include <vector>
+using namespace std;
 
-static std::unordered_map<std::string, std::unique_ptr<DISCRETE_DIST>(*)(Piece*)> m { 
+static unordered_map<string, unique_ptr<DISCRETE_DIST>(*)(Piece*)> m { 
     { "IntervalDist", &IntervalDist},
 	{ "IntervalClassDist", &IntervalClassDist},
 	{ "ChordSize", &ChordSize},
@@ -48,6 +50,50 @@ static std::unordered_map<std::string, std::unique_ptr<DISCRETE_DIST>(*)(Piece*)
 	{ "Pitch", &Pitch},
 	{ "ChordOuterInterval", &ChordOuterInterval},
 	{ "ChordDistance", &ChordDistance}
+};
+
+static unordered_map<string, vector<string>> feature_tag_map { 
+    { "ORIGINAL", {"IntervalDist",
+		"IntervalClassDist",
+		"ChordSize",
+		"ChordPCSizeRatio",
+		"ChordOnsetRatio",
+		"ChordDistinctDurationRatio",
+		"ChordDuration",
+		"ChordShape",
+		"ChordOnsetShape",
+		"ChordPCD",
+		"ChordPCDWBass",
+		"ChordOnsetPCD",
+		"ChordOnsetTiePCD",
+		"ChordOnsetTiePCDTogether",
+		"ChordTonnetz",
+		"ChordOnset",
+		"ChordRange",
+		"ChordDissonance",
+		"ChordTranDissonance",
+		"ChordLowestInterval",
+		"ChordSizeNgram",
+		"ChordTranVoiceMotion",
+		"ChordTranRepeat",
+		"ChordTranScaleDistance",
+		"ChordTranScaleUnion",
+		"ChordTranDistance",
+		"ChordTranOuter",
+		"ChordTranBassInterval",
+		"ChordTranMelodyInterval",
+		"ChordMelodyNgram"}},
+	{ "MIREX", {"ChordSizeDurationWeighted",
+		"OffsetDistrubution",
+		"MelodicInterval",
+		"DurationDifference",
+		"OnsetDifference",
+		"Onset",
+		"Duration",
+		"ChordOnsetDifference",
+		"Pitch",
+		"ChordOuterInterval",
+		"ChordDistance"}}
 };
 
 #endif
