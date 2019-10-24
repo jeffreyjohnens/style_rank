@@ -37,7 +37,6 @@ static std::unordered_map<std::string, std::unique_ptr<DISCRETE_DIST>(*)(Piece*)
 	{ "ChordTranBassInterval", &ChordTranBassInterval},
 	{ "ChordTranMelodyInterval", &ChordTranMelodyInterval},
 	{ "ChordMelodyNgram", &ChordMelodyNgram},
-	{ "PCDTran", &PCDTran},
 	{ "ChordSizeDurationWeighted", &ChordSizeDurationWeighted},
 	{ "OffsetDistrubution", &OffsetDistrubution},
 	{ "MelodicInterval", &MelodicInterval},

@@ -525,7 +525,9 @@ uint64_t roll_to_min(uint64_t x, int n) {
   return min;
 }
 
-unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) {
+// TODO : fix this ... why is this implemented this way
+/*
+unique_ptr_IGNORE<DISCRETE_DIST> PCDTran(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->unique_onsets.size() - 2; i++) {
     auto c1 = p->findOverlapping(p->unique_onsets[i], p->unique_onsets[i+1]);
@@ -534,6 +536,7 @@ unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) {
   }
   return d;
 }
+*/
 
 // TODO : make two chord sequences
 // one based on onsets and another based on offsets
@@ -557,7 +560,7 @@ def offset_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> OffsetDistrubution(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(mod(note->qend, p->r*16), 0, p->r*16)]++;
+    (*d)[clamp(mod(note->end, p->r*16), 0, p->r*16)]++;
   }
   return d;
 }
@@ -582,7 +585,7 @@ def duration_difference_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> DurationDifference(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->qduration - p->notes[i]->qduration, -1*p->r*16, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->duration - p->notes[i]->duration, -1*p->r*16, p->r*16)];
   }
   return d;
 }
@@ -596,7 +599,7 @@ def onset_difference_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> OnsetDifference(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->qonset - p->notes[i]->qonset, 0, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->onset - p->notes[i]->onset, 0, p->r*16)];
   }
   return d;
 }
@@ -609,7 +612,7 @@ def onset_distrubution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Onset(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(mod(note->qonset, p->r*4), 0, p->r*4)];
+    (*d)[clamp(mod(note->onset, p->r*4), 0, p->r*4)];
   }
   return d;
 }
@@ -622,7 +625,7 @@ def duration_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Duration(Piece *p) {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(note->qduration, 0, p->r*16)];
+    (*d)[clamp(note->duration, 0, p->r*16)];
   }
   return d;
 }
@@ -764,7 +767,10 @@ unique_ptr<DISCRETE_DIST> ChordDistance(Piece *p) {
       set_union += (int)(kv.second == 1);
       set_inter += (int)(kv.second > 1);
     }
-    (*d)[(int)(set_inter / set_union * (N-1))]++;
+    if (set_union != 0) {
+      (*d)[(int)(set_inter / set_union * (N-1))]++;
+    }
+    // TODO : what is else ?
   }
   return d;
 }
