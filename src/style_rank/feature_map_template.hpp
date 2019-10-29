@@ -4,6 +4,7 @@
 #include "utils.hpp"
 
 #include <unordered_map>
+#include <set>
 #include <string>
 #include <vector>
 using namespace std;
@@ -14,6 +15,10 @@ static unordered_map<string, unique_ptr<DISCRETE_DIST>(*)(Piece*)> m {
 
 static unordered_map<string, vector<string>> feature_tag_map { 
     $FEATURE_TAG_MAP
+};
+
+static set<string> feature_tags {
+    $FEATURE_TAGS
 };
 
 #endif

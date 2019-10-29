@@ -4,6 +4,7 @@
 #include "utils.hpp"
 
 #include <unordered_map>
+#include <set>
 #include <string>
 #include <vector>
 using namespace std;
@@ -83,6 +84,47 @@ static unordered_map<string, vector<string>> feature_tag_map {
 		"ChordTranBassInterval",
 		"ChordTranMelodyInterval",
 		"ChordMelodyNgram"}},
+	{ "ALL", {"IntervalDist",
+		"IntervalClassDist",
+		"ChordSize",
+		"ChordPCSizeRatio",
+		"ChordOnsetRatio",
+		"ChordDistinctDurationRatio",
+		"ChordDuration",
+		"ChordShape",
+		"ChordOnsetShape",
+		"ChordPCD",
+		"ChordPCDWBass",
+		"ChordOnsetPCD",
+		"ChordOnsetTiePCD",
+		"ChordOnsetTiePCDTogether",
+		"ChordTonnetz",
+		"ChordOnset",
+		"ChordRange",
+		"ChordDissonance",
+		"ChordTranDissonance",
+		"ChordLowestInterval",
+		"ChordSizeNgram",
+		"ChordTranVoiceMotion",
+		"ChordTranRepeat",
+		"ChordTranScaleDistance",
+		"ChordTranScaleUnion",
+		"ChordTranDistance",
+		"ChordTranOuter",
+		"ChordTranBassInterval",
+		"ChordTranMelodyInterval",
+		"ChordMelodyNgram",
+		"ChordSizeDurationWeighted",
+		"OffsetDistrubution",
+		"MelodicInterval",
+		"DurationDifference",
+		"OnsetDifference",
+		"Onset",
+		"Duration",
+		"ChordOnsetDifference",
+		"Pitch",
+		"ChordOuterInterval",
+		"ChordDistance"}},
 	{ "MIREX", {"ChordSizeDurationWeighted",
 		"OffsetDistrubution",
 		"MelodicInterval",
@@ -94,6 +136,10 @@ static unordered_map<string, vector<string>> feature_tag_map {
 		"Pitch",
 		"ChordOuterInterval",
 		"ChordDistance"}}
+};
+
+static set<string> feature_tags {
+    "ORIGINAL","ALL","MIREX"
 };
 
 #endif

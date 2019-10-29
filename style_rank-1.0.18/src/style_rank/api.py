@@ -173,5 +173,5 @@ def rank(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimato
   dists = dmat[labels==0][:,labels==1].sum(1)
   order = np.argsort(dists)[::-1]
   if return_similarity:
-    return paths[order], dists[order]
+    return list(zip(paths[order], dists[order]))
   return paths[order]
