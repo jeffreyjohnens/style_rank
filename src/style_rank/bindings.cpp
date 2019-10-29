@@ -18,7 +18,6 @@ vector<string> get_feature_names(string tag="ALL") {
     return feature_tag_map[tag];
   return vector<string>();
   //return extract_keys<string,unique_ptr<DISCRETE_DIST>(*)(Piece*)>(m);
-
 }
 
 tuple<VECTOR_MAP,VECTOR_MAP,vector<int>> get_features_internal(vector<string> &paths, vector<string> &feature_names, int upper_bound, int resolution, bool include_offsets) {
