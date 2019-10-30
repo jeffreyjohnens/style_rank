@@ -72,12 +72,18 @@ public:
     for (int i=0; i<(int)x.size(); i++)
       value |= (1 << mod(x[i], 12));
   }
-  PCINT(vector<int>::iterator begin, vector<int>::iterator end) {
+  PCINT(vector<int>::iterator b, vector<int>::iterator e) {
     value = 0;
-    for (auto it = begin; it != end; it++) {
+    for (auto it = b; it != e; it++) {
       value |= (1 << mod(*it, 12));
+    }
   }
-}
+  PCINT(vector<unique_ptr<NOTE>>::iterator b, vector<unique_ptr<NOTE>>::iterator e) {
+    value = 0;
+    for (auto it = b; it != e; it++) {
+      value |= (1 << mod((*it)->pitch, 12));
+    }
+  }
   PCINT(const vector<NOTE*> &notes) {
     value = 0;
     for (const auto &note : notes) {

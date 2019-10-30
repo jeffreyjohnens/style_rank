@@ -101,7 +101,6 @@ unique_ptr<DISCRETE_DIST> ChordOnsetRatio(Piece *p) /*ORIGINAL*/ {
   return d;
 }
 
-// should these be logged first?
 unique_ptr<DISCRETE_DIST> ChordDistinctDurationRatio(Piece *p) /*ORIGINAL*/ {
   /*
   The ratio of distinct durations to the number of pitches in a chord.
@@ -328,7 +327,6 @@ unique_ptr<DISCRETE_DIST> ChordLowestInterval(Piece *p) /*ORIGINAL*/ {
   return d;
 }
 
-// 3 does not work very well
 unique_ptr<DISCRETE_DIST> ChordSizeNgram(Piece *p) /*ORIGINAL*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->chords.size() - 2; i++) {
@@ -370,7 +368,6 @@ unique_ptr<DISCRETE_DIST> ChordTranVoiceMotion(Piece *p) /*ORIGINAL*/ {
   return d;
 }
 
-// THIS IS REALLY BAD
 unique_ptr<DISCRETE_DIST> ChordTranRepeat(Piece *p) /*ORIGINAL*/ {
   /*
   The frequency of complete chord repetition.
@@ -410,7 +407,6 @@ unique_ptr<DISCRETE_DIST> ChordTranScaleDistance(Piece *p) /*ORIGINAL*/ {
     else {
       uint64_t data = (pcscale[a] ^ pcscale[b]);
       (*d)[popcnt(&data, sizeof(uint64_t))]++;
-      //assert(popcnt(&data, sizeof(uint64_t)) == __builtin_popcount(pcscale[a] ^ pcscale[b])); 
       //(*d)[__builtin_popcount(pcscale[a] ^ pcscale[b])]++;
     }
   }
@@ -431,7 +427,6 @@ unique_ptr<DISCRETE_DIST> ChordTranScaleUnion(Piece *p) /*ORIGINAL*/ {
     else {
       uint64_t data = (pcscale[a] | pcscale[b]);
       (*d)[popcnt(&data, sizeof(uint64_t))]++;
-      //assert(popcnt(&data, sizeof(uint64_t)) == __builtin_popcount(pcscale[a] | pcscale[b]));
       //(*d)[__builtin_popcount(pcscale[a] | pcscale[b])]++;
     }
   }
@@ -544,12 +539,12 @@ unique_ptr_IGNORE<DISCRETE_DIST> PCDTran(Piece *p) {
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
 
-// TODO : make two chord sequences
-// one based on onsets and another based on offsets
-// new functions based on the stuff
-// TODO : need to allow for quantization in notes
-// TODO : test out clamp
+// MONO FUNCTIONS
 
+/*
+def chord_size_duration_weighted(p, resolution=8):
+  return count([len(c) for c in p.chords], weights=p.chord_durs, max=2)
+*/
 unique_ptr<DISCRETE_DIST> ChordSizeDurationWeighted(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
@@ -559,7 +554,6 @@ unique_ptr<DISCRETE_DIST> ChordSizeDurationWeighted(Piece *p) /*MIREX*/ {
 }
 
 /*
-@feature
 def offset_distribution(p, resolution=8):
   return count((p.onsets + p.durations) % (resolution*16), max=resolution*16)
 */
@@ -571,47 +565,43 @@ unique_ptr<DISCRETE_DIST> OffsetDistrubution(Piece *p) /*MIREX*/ {
   return d;
 }
 
-/*@feature
+/*
 def interval_distribution(p, resolution=8):
   return count(np.diff(p.pitches) + 128, max=256)
 */
 unique_ptr<DISCRETE_DIST> MelodicInterval(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp((p->notes[i+1]->pitch - p->notes[i]->pitch), -128, 128)];
+    (*d)[clamp((p->notes[i+1]->pitch - p->notes[i]->pitch), -128, 128)]++;
   }
   return d;
 }
 
-
-/*@feature
+/*
 def duration_difference_distribution(p, resolution=8):
   return count(np.diff(p.durations) + resolution*16, max=resolution*32)
 */
 unique_ptr<DISCRETE_DIST> DurationDifference(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->duration - p->notes[i]->duration, -1*p->r*16, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->duration - p->notes[i]->duration + p->r*16, 0, p->r*32)]++;
   }
   return d;
 }
 
-
 /*
-@feature
 def onset_difference_distribution(p, resolution=8):
   return count(np.diff(p.onsets), max=resolution*16)
 */
 unique_ptr<DISCRETE_DIST> OnsetDifference(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (int i=0; i<(int)p->notes.size()-1; i++) {
-    (*d)[clamp(p->notes[i+1]->onset - p->notes[i]->onset, 0, p->r*16)];
+    (*d)[clamp(p->notes[i+1]->onset - p->notes[i]->onset, 0, p->r*16)]++;
   }
   return d;
 }
 
 /*
-@feature
 def onset_distrubution(p, resolution=8):
   return count(p.onsets % (resolution*4), max=resolution*4)
 */
@@ -624,7 +614,6 @@ unique_ptr<DISCRETE_DIST> Onset(Piece *p) /*MIREX*/ {
 }
 
 /*
-@feature
 def duration_distribution(p, resolution=8):
   return count(p.durations, max=resolution*16)
 */
@@ -636,46 +625,54 @@ unique_ptr<DISCRETE_DIST> Duration(Piece *p) /*MIREX*/ {
   return d;
 }
 
-
 /*
-@feature
 def melodic_ngram_pcd(p, resolution=8):
   return count([pcd[toInt(_)] for _ in window(p.pitches,4)], max=352)
 */
-/*uNOnique_ptr<DISCRETE_DIST> MelodicNGramPCD(Piece *p) {
+unique_ptr<DISCRETE_DIST> MelodicNGramPCD(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  for (const auto &note : p->notes) {
-    (*d)[clamp(note->duration, 0, p->r*16)];
+  for (int i=0; i<(int)p->notes.size()-3; i++) {
+    (*d)[pcd[PCINT(p->notes.begin()+i, p->notes.begin()+i+4).value]]++;
   }
   return d;
 }
-*/
 
 ///////////////////////////////////////////////////////////////////////
 // polyphony
 
 /*
-@feature
+def chord_durations(p, resolution=8):
+  return count([d for d,c in zip(p.chord_durs, p.chords) if len(c)], max=resolution*16)
+*/
+unique_ptr<DISCRETE_DIST> ChordDurationMirex(Piece *p) /*MIREX*/ {
+  auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
+  for (const auto &chord : p->chords) {
+    if (!chord.notes.empty()) {
+      (*d)[clamp(chord.duration,0,p->r*16)]++;
+    }
+  }
+  return d;
+}
+
+/*
+IMPLEMENTED IN MONO
 def offset_distribution(p, resolution=8):
   return count((p.onsets + p.durations) % (resolution*16), max=resolution*16)
 */
 
 /*
-@feature
 def chord_onset_difference_distribution(p, resolution=8):
   return count(np.diff(p.segments) + 128, max=256)
 */
 unique_ptr<DISCRETE_DIST> ChordOnsetDifference(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &it : zipper<CHORD>(p->chords)) {
-    (*d)[it.second.onset - it.first.onset]++;
+    (*d)[clamp(it.second.onset - it.first.onset + 128,0,256)]++;
   }
   return d;
 }
 
-
 /*
-@feature
 def pitch_distribution(p, resolution=8):
   return count(p.pitches, max=128)
 */
@@ -687,14 +684,12 @@ unique_ptr<DISCRETE_DIST> Pitch(Piece *p) /*MIREX*/ {
   return d;
 }
 
-
 /*
 @feature
 def chord_onset_structure(p, resolution=8):
   return count([(c*(2**np.arange(len(c)))).sum() for c in p.chord_onsets], max=2**8)
 */
 // ALREADY IMPLEMENTED
-
 
 /*
 @feature
@@ -732,7 +727,6 @@ def chord_size(p, resolution=8):
 // ALREADY IMPLEMENTED
 
 /*
-@feature
 def chord_outer_interval(p, resolution=8):
   return count([np.max(c)-np.min(c) % 12 if len(c) else 0 for c in p.chords], weights=p.chord_durs, max=12)
 */
@@ -776,7 +770,6 @@ unique_ptr<DISCRETE_DIST> ChordDistance(Piece *p) /*MIREX*/ {
     if (set_union != 0) {
       (*d)[(int)(set_inter / set_union * (N-1))]++;
     }
-    // TODO : what is else ?
   }
   return d;
 }
