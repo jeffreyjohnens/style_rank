@@ -1,6 +1,6 @@
 # StyleRank
 
-![alt text](https://github.com/jeffreyjohnens/style_rank/blob/master/diagram/diagram.png)
+![alt text](https://github.com/jeffreyjohnens/style_rank/blob/master/diagram/diagram_new.png)
 
 StyleRank is a method to rank MIDI files based on their similarity to an arbitrary musical style delineated by a collection of MIDI files. MIDI files are encoded using a novel set of features and an embedding is learned using Random Forests. For a detailed explanation see the [paper](https://github.com/jeffreyjohnens/style_rank/tree/master/paper).
 
@@ -49,7 +49,7 @@ Find the documentation for each feature here. (in progress)
 
 If you want to cite StyleRank, please use the following citation.
 
-Ens,J. and Pasquier,P. Quantifying Musical Style: Ranking Symbolic Music based on Similarity to a Style. International Symposium on Music Information Retrieval (forthcoming 2019).
+Ens,J. and Pasquier,P. Quantifying Musical Style: Ranking Symbolic Music based on Similarity to a Style. In: Proceedings of the International Symposium on Music Information Retrieval. 2019 pp. 870-877.
 
 ## License
 
