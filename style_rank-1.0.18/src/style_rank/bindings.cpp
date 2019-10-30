@@ -25,7 +25,7 @@ tuple<VECTOR_MAP,VECTOR_MAP,vector<int>> get_features_internal(vector<string> &p
   }
   Collector c;
   vector<int> indices;
-  for (int i=0; i<paths.size(); i++) {
+  for (int i=0; i<(int)paths.size(); i++) {
     Piece *p = new Piece(paths[i], resolution, include_offsets);
     if ((p) && (p->chords.size() > 10)) {
       for (const auto &name : feature_names) {

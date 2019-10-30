@@ -34,7 +34,7 @@ int rough_quantize(int x, int ticks) {
 unique_ptr<DISCRETE_DIST> IntervalDist(Piece *p) /*ORIGINAL*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &chord : p->chords) {
-    for (int j=0; j<chord.notes.size(); j++) {
+    for (int j=0; j<(int)chord.notes.size(); j++) {
       for (int k=j+1; k<(int)chord.notes.size(); k++) {
         (*d)[mod(chord.notes[k]->pitch - chord.notes[j]->pitch, 12)] += chord.duration;
       }
@@ -382,7 +382,7 @@ unique_ptr<DISCRETE_DIST> ChordTranRepeat(Piece *p) /*ORIGINAL*/ {
     }
     if ((allOnsets) && (p->chords[i].notes.size() == p->chords[i+1].notes.size())) {
       bool allMatch = true;
-      for (int j=0; j<p->chords[i].notes.size(); j++) {
+      for (int j=0; j<(int)p->chords[i].notes.size(); j++) {
         if (p->chords[i].notes[j]->pitch != p->chords[i+1].notes[j]->pitch) {
           allMatch = false;
         }
@@ -522,18 +522,13 @@ uint64_t roll_to_min(uint64_t x, int n) {
   return min;
 }
 
-// TODO : fix this ... why is this implemented this way
-/*
-unique_ptr_IGNORE<DISCRETE_DIST> PCDTran(Piece *p) {
+unique_ptr<DISCRETE_DIST> PCDTran(Piece *p) /*ORIGINAL*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
-  for (int i=0; i<(int)p->unique_onsets.size() - 2; i++) {
-    auto c1 = p->findOverlapping(p->unique_onsets[i], p->unique_onsets[i+1]);
-    auto c2 = p->findOverlapping(p->unique_onsets[i+1], p->unique_onsets[i+2]);
-    (*d)[ roll_to_min(PCINT(c1).value + (PCINT(c2).value << 12), 24) ]++;
+  for (int i=0; i<(int)p->chords.size() - 1; i++) {
+    (*d)[ roll_to_min(PCINT(p->chords[i].notes).value + (PCINT(p->chords[i+1].notes).value << 12), 24)]++;
   }
   return d;
 }
-*/
 
 /////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////
