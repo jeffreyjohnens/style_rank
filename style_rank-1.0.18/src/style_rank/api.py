@@ -69,13 +69,15 @@ def get_features(paths, upper_bound=500, feature_names=[], resolution=0, include
     paths (list): a list of midi filepaths.
     upper_bound (int): the maximum cardinality of each categorical distribution.
     feature_names (list): a list of features to extract
+    resolution (int): the number of divisions per beat for the quantization of time-based values. If resolution=0, no quantization will take place.
+    include_offsets (int): a boolean flag indicating if offsets will be considered for chord segment boundaries.
   Returns:
     fs (dict): a dictionary of categorical distributions (np.ndarray) indexed by feature name.
     domains (dict): a dictionary of categorical domains (np.ndarray) indexed by feature name.
     path_indices (np.ndarray): an integer array indexing the filepaths from which features were sucessfully extracted.
   """
   paths, path_indices = validate_paths(paths)
-  feature_names = [f for f in feature_names if f in get_feature_names()]
+  feature_names = [f for f in feature_names if f in get_feature_names("ALL")]
   (fs, domains, indices) = get_features_internal(paths, feature_names, upper_bound, resolution, include_offsets)
   fs = {k : np.array(v).reshape(-1,len(domains[k])+1) for k,v in fs.items()}
   domains = {k : np.array(v) for k,v in domains.items()}
@@ -88,7 +90,9 @@ def get_feature_csv(paths, output_dir, upper_bound=500, feature_names=[], resolu
     paths (list): a list of midi filepaths.
     output_dir (str): a directory to store the feature .csv's
     upper_bound (int): the maximum cardinality of each categorical distribution.
-    feature_names (list): a list of features to extract
+    feature_names (list): a list of features to extract.
+    resolution (int): the number of divisions per beat for the quantization of time-based values. If resolution=0, no quantization will take place.
+    include_offsets (int): a boolean flag indicating if offsets will be considered for chord segment boundaries.
   """
   data, domains, indices = get_features(
     paths, upper_bound=upper_bound, feature_names=feature_names, resolution=resolution, include_offsets=include_offsets)
@@ -108,7 +112,7 @@ def rf_embed(feature, labels, n_estimators=100, max_depth=3):
     n_estimators (int): the number of trees in the random forest
     max_depth (int): the maximum depth of each tree
   Returns:
-    dist_mat (np.ndarray): a matrix containg all pairwise distances for a single categorical distribution (feature).
+    sim_mat (np.ndarray): a matrix containg all pairwise similarities for a single categorical distribution (feature).
   """
   clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, bootstrap=True, criterion='entropy', class_weight='balanced')
   clf.fit(feature, labels)
@@ -117,20 +121,23 @@ def rf_embed(feature, labels, n_estimators=100, max_depth=3):
     OneHotEncoder(categories='auto').fit_transform(leaves).todense())
   return 1. - cosine_distances(embedded)
 
-def get_distance_matrix(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False, resolution=0, include_offsets=False, feature_names=[]):
-  """construct a distance matrix
+def get_similarity_matrix(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False, resolution=0, include_offsets=False, feature_names=[]):
+  """construct a similarity matrix
   Args:
     rank_set (list/np.ndarray): a list/array of midis to be ranked.
     style_set (list/np.ndarray): a list/array of midis to define the style.
-    features (dict): a dictionary of categorical distributions (np.ndarray) indexed by feature name.
+    raw_features (dict): a dictionary of categorical distributions (np.ndarray) indexed by feature name.
     upper_bound (int): the maximum cardinality of each categorical distribution.
     n_estimators (int): the number of trees in the random forest.
     max_depth (int): the maximum depth of each tree.
     return_paths_and_labels (int): a boolean flag indicating whether these items should be returned or not
+    resolution (int): the number of divisions per beat for the quantization of time-based values. If resolution=0, no quantization will take place.
+    include_offsets (int): a boolean flag indicating if offsets will be considered for chord segment boundaries.
+    feature_names (list): a list of features to extract. if feature_names=[] all features will be used.
   Returns:
-    dist_mat (np.ndarray): a matrix containg all pairwise distances.
-    paths (np.ndarray) : an array of midi filepaths corresponding to each row/col in the distance matrix.
-    labels (np.ndarray): an array of labels corresponding to each row/col in the distance matrix.
+    sim_mat (np.ndarray): a matrix containg all pairwise similarities.
+    paths (np.ndarray) : an array of midi filepaths corresponding to each row/col in the similarity matrix.
+    labels (np.ndarray): an array of labels corresponding to each row/col in the similarity matrix.
   """
   # create paths and labels
   rank_set,_ = validate_paths(rank_set, list_name="rank_set")
@@ -151,18 +158,18 @@ def get_distance_matrix(rank_set, style_set, raw_features=None, upper_bound=500,
   validate_labels(labels)
 
   # create embedding via trained random forests
-  dist_mat = []
+  sim_mat = []
   for _,feature in features.items():
-    dist_mat.append( 
+    sim_mat.append( 
       rf_embed(feature, labels, n_estimators=n_estimators, max_depth=max_depth))
-  dist_mat = np.mean(np.array(dist_mat),axis=0)
+  sim_mat = np.mean(np.array(sim_mat),axis=0)
 
   if return_paths_and_labels:
-    return dist_mat, paths[indices], labels
-  return dist_mat
+    return sim_mat, paths[indices], labels
+  return sim_mat
 
 def rank(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=100, max_depth=3, return_similarity=False, resolution=0, include_offsets=False, feature_names=[], json_path=None):
-  """construct a distance matrix
+  """construct a similarity matrix
   Args:
     rank_set (list/np.ndarray): a list/array of midis to be ranked.
     style_set (list/np.ndarray): a list/array of midis to define the style.
@@ -178,15 +185,15 @@ def rank(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=1
   Returns:
     paths (np.ndarray): an array containing the rank_set sorted from most to least stylistically similar to the corpus.
   """
-  dmat,paths,labels = get_distance_matrix(rank_set, style_set, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, raw_features=raw_features, resolution=resolution, include_offsets=include_offsets, feature_names=feature_names)
-  dists = dmat[labels==0][:,labels==1].sum(1)
-  order = np.argsort(dists)[::-1]
-  sim_output = list(zip(paths[order], dists[order]))
+  sim_mat,paths,labels = get_similarity_matrix(rank_set, style_set, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, raw_features=raw_features, resolution=resolution, include_offsets=include_offsets, feature_names=feature_names)
+  sims = sim_mat[labels==0][:,labels==1].sum(1)
+  order = np.argsort(sims)[::-1]
+  output = list(zip(paths[order], sims[order]))
   if json_path is not None:
     with open(json_path, "w") as f:
       f.write(json.dumps(
-        {str(p):float(d) for p,d in sorted(sim_output,key=lambda x:x[1])}, 
+        {str(p):float(d) for p,d in sorted(output,key=lambda x:x[1])}, 
         indent=4))
   if return_similarity:
-    return sim_output
+    return output
   return paths[order]
