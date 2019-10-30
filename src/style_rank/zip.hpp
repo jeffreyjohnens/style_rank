@@ -40,13 +40,17 @@ class zipper {
     }
 };
 
+
 /*
+#include <vector>
+#include <iostream>
+
 int main() {
   std::vector<double> a {1.0, 2.0, 3.0};
   std::vector<double> b {1.0, 4.0};
 
-  for (const auto &x : zipper<double>(a)) {
-    std::cout << x.first << " " << x.second << std::endl;
+  for (const auto &x : Zip::Zip(a,b)) {
+    std::cout << std::get<0>(x) << " " << std::get<1>(x) << std::endl;
   }
 }
 */

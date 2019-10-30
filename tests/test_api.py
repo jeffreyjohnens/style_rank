@@ -3,6 +3,7 @@ from style_rank import rank
 import style_rank as sr
 
 print( sr.get_feature_names("MIREX") )
+print( sr.get_feature_names("NULL") )
 exit()
 
 def get_midi_paths(folder):

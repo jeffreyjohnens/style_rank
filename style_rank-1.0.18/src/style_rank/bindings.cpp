@@ -13,17 +13,15 @@
 namespace py = pybind11;
 using namespace std;
 
-vector<string> get_feature_names(string tag="ALL") {
+vector<string> get_feature_names_internal(string tag="ORIGINAL") {
   if (feature_tags.find(tag) != feature_tags.end())
     return feature_tag_map[tag];
   return vector<string>();
-  //return extract_keys<string,unique_ptr<DISCRETE_DIST>(*)(Piece*)>(m);
-
 }
 
 tuple<VECTOR_MAP,VECTOR_MAP,vector<int>> get_features_internal(vector<string> &paths, vector<string> &feature_names, int upper_bound, int resolution, bool include_offsets) {
   if (feature_names.size() == 0) {
-    feature_names = get_feature_names();
+    feature_names = get_feature_names_internal();
   }
   Collector c;
   vector<int> indices;
@@ -41,5 +39,5 @@ tuple<VECTOR_MAP,VECTOR_MAP,vector<int>> get_features_internal(vector<string> &p
 
 PYBIND11_MODULE(_style_rank,m) {
   m.def("get_features_internal", &get_features_internal);
-  m.def("get_feature_names", &get_feature_names);
+  m.def("get_feature_names_internal", &get_feature_names_internal);
 }

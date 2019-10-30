@@ -1,5 +1,6 @@
 import os
 import csv
+import json
 import numpy as np
 import warnings
 from scipy.stats import rankdata
@@ -9,7 +10,10 @@ from sklearn.metrics.pairwise import cosine_distances
 from sklearn.preprocessing import OneHotEncoder
 
 # import c++ code
-from ._style_rank import get_features_internal, get_feature_names
+from ._style_rank import get_features_internal, get_feature_names_internal
+
+def get_feature_names(tag="ORIGINAL"):
+  return get_feature_names_internal(tag)
 
 def validate_labels(labels):
   """ensure that labels are well formed.
@@ -17,9 +21,9 @@ def validate_labels(labels):
     labels (list): a list of integers on the range [0,1]
   """
   if (labels==0).sum() == 0:
-    raise Exception("All to_rank_paths were corrupt")
+    raise Exception("All rank_set were corrupt")
   if (labels==1).sum() == 0:
-    raise Exception("All corpus_paths were corrupt")
+    raise Exception("All style_set were corrupt")
 
 def validate_features(paths, labels, features):
   """ensure that the features are well formed with respect to the paths and labels.
@@ -113,11 +117,11 @@ def rf_embed(feature, labels, n_estimators=100, max_depth=3):
     OneHotEncoder(categories='auto').fit_transform(leaves).todense())
   return 1. - cosine_distances(embedded)
 
-def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False, resolution=0, include_offsets=False):
+def get_distance_matrix(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=100, max_depth=3, return_paths_and_labels=False, resolution=0, include_offsets=False, feature_names=[]):
   """construct a distance matrix
   Args:
-    to_rank_paths (list/np.ndarray): a list/array of midis to be ranked.
-    corpus_paths (list/np.ndarray): a list/array of midis to define the style.
+    rank_set (list/np.ndarray): a list/array of midis to be ranked.
+    style_set (list/np.ndarray): a list/array of midis to define the style.
     features (dict): a dictionary of categorical distributions (np.ndarray) indexed by feature name.
     upper_bound (int): the maximum cardinality of each categorical distribution.
     n_estimators (int): the number of trees in the random forest.
@@ -129,20 +133,21 @@ def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=
     labels (np.ndarray): an array of labels corresponding to each row/col in the distance matrix.
   """
   # create paths and labels
-  to_rank_paths,_ = validate_paths(to_rank_paths, list_name="to_rank_paths")
-  corpus_paths,_ = validate_paths(corpus_paths, list_name="corpus_paths")
-  paths = np.hstack([to_rank_paths, corpus_paths])
-  labels = np.array([0] * len(to_rank_paths) + [1] * len(corpus_paths))
+  rank_set,_ = validate_paths(rank_set, list_name="rank_set")
+  style_set,_ = validate_paths(style_set, list_name="style_set")
+  paths = np.hstack([rank_set, style_set])
+  labels = np.array([0] * len(rank_set) + [1] * len(style_set))
 
   # extract features
-  if features is None:
-    features, _, indices = get_features(paths, upper_bound=upper_bound, resolution=resolution, include_offsets=include_offsets)
+  if raw_features is None:
+    features, _, indices = get_features(paths, upper_bound=upper_bound, resolution=resolution, include_offsets=include_offsets, feature_names=feature_names)
     labels = labels[indices]
   else:
-    validate_features(paths, labels, features)
+    validate_features(paths, labels, raw_features)
     indices = np.arange(len(paths))
+    features = raw_features
   
-  # ensure corpus_paths and to_rank_paths were parsed
+  # ensure style_set and rank_set were parsed
   validate_labels(labels)
 
   # create embedding via trained random forests
@@ -156,22 +161,32 @@ def get_distance_matrix(to_rank_paths, corpus_paths, features=None, upper_bound=
     return dist_mat, paths[indices], labels
   return dist_mat
 
-def rank(to_rank_paths, corpus_paths, features=None, upper_bound=500, n_estimators=100, max_depth=3, return_similarity=False, resolution=0, include_offsets=False):
+def rank(rank_set, style_set, raw_features=None, upper_bound=500, n_estimators=100, max_depth=3, return_similarity=False, resolution=0, include_offsets=False, feature_names=[], json_path=None):
   """construct a distance matrix
   Args:
-    to_rank_paths (list/np.ndarray): a list/array of midis to be ranked.
-    corpus_paths (list/np.ndarray): a list/array of midis to define the style.
+    rank_set (list/np.ndarray): a list/array of midis to be ranked.
+    style_set (list/np.ndarray): a list/array of midis to define the style.
     features (dict): a dictionary of categorical distributions (np.ndarray) indexed by feature name.
     upper_bound (int): the maximum cardinality of each categorical distribution.
     n_estimators (int): the number of trees in the random forest.
     max_depth (int): the maximum depth of each tree.
     return_similarity (bool) : return the cosine similarity to the corpus for each ranked MIDI.
+    resolution (int): the number of divisions per beat for the quantization of time-based values. If resolution=0, no quantization will take place.
+    include_offsets (int): a boolean flag indicating if offsets will be considered for chord segment boundaries.
+    feature_names (list): a list of features to extract. if feature_names=[] all features will be used.
+    json_path (str): if not None, the ranks will be written to a .json file.
   Returns:
-    paths (np.ndarray): an array containing the to_rank_paths sorted from most to least stylistically similar to the corpus.
+    paths (np.ndarray): an array containing the rank_set sorted from most to least stylistically similar to the corpus.
   """
-  dmat,paths,labels = get_distance_matrix(to_rank_paths, corpus_paths, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, features=features, resolution=resolution, include_offsets=include_offsets)
+  dmat,paths,labels = get_distance_matrix(rank_set, style_set, upper_bound=upper_bound, n_estimators=n_estimators, max_depth=max_depth, return_paths_and_labels=True, raw_features=raw_features, resolution=resolution, include_offsets=include_offsets, feature_names=feature_names)
   dists = dmat[labels==0][:,labels==1].sum(1)
   order = np.argsort(dists)[::-1]
+  sim_output = list(zip(paths[order], dists[order]))
+  if json_path is not None:
+    with open(json_path, "w") as f:
+      f.write(json.dumps(
+        {str(p):float(d) for p,d in sorted(sim_output,key=lambda x:x[1])}, 
+        indent=4))
   if return_similarity:
-    return list(zip(paths[order], dists[order]))
+    return sim_output
   return paths[order]
