@@ -15,6 +15,44 @@ from ._style_rank import get_features_internal, get_feature_names_internal
 def get_feature_names(tag="ORIGINAL"):
   return get_feature_names_internal(tag)
 
+# checking arguments ...
+def validate_argument(x, name):
+  class domain:
+    def __init__(self,lb=None,ub=None,dom=None):
+      if lb is not None:
+        assert lb <= ub
+      self.lb=lb
+      self.ub=ub
+      self.dom=dom
+    def check(self,x):
+      if self.lb is not None:
+        return self.lb <= x <= self.ub
+      return x in self.dom
+    def __repr__(self):
+      if self.lb is not None:
+        return "[%d,%d]" % (self.lb, self.ub)
+      return str(self.dom)
+
+  TOTAL_UPPER_BOUND = 100000
+  recommend = {
+    "upper_bound" : domain(lb=100, ub=500),
+    "resolution" : domain(dom=[0,4,8,16]),
+    "n_estimators" : domain(lb=50,ub=500),
+    "max_depth" : domain(dom=[2,3]),
+  }
+  valid = {
+    "upper_bound" : domain(lb=1, ub=TOTAL_UPPER_BOUND),
+    "resolution" : domain(lb=0,ub=TOTAL_UPPER_BOUND),
+    "n_estimators" : domain(lb=1,ub=TOTAL_UPPER_BOUND),
+    "max_depth" : domain(lb=1,ub=TOTAL_UPPER_BOUND)
+  }
+  if not recommend[name].check(x):
+    args = (name, str(x), str(recommend[name]))
+    warnings.warn('%s=%s is outside of recommended range %s' % args)
+  if not valid[name].check(x):
+    args = (name, str(x), str(valid[name]))
+    raise ValueError('%s=%s is outside valid range %s' % args)
+
 def validate_labels(labels):
   """ensure that labels are well formed.
   Args:
@@ -76,8 +114,9 @@ def get_features(paths, upper_bound=500, feature_names=[], resolution=0, include
     domains (dict): a dictionary of categorical domains (np.ndarray) indexed by feature name.
     path_indices (np.ndarray): an integer array indexing the filepaths from which features were sucessfully extracted.
   """
-  if upper_bound < 1:
-    raise ValueError("upper_bound (the maximum cardinality of each categorical distribution) must be atleast 1")
+  validate_argument(upper_bound, "upper_bound")
+  validate_argument(resolution, "resolution")
+
   paths, path_indices = validate_paths(paths)
   feature_names = [f for f in feature_names if f in get_feature_names("ALL")]
   (fs, domains, indices) = get_features_internal(paths, feature_names, upper_bound, resolution, include_offsets)
@@ -141,6 +180,9 @@ def get_similarity_matrix(rank_set, style_set, raw_features=None, upper_bound=50
     paths (np.ndarray) : an array of midi filepaths corresponding to each row/col in the similarity matrix.
     labels (np.ndarray): an array of labels corresponding to each row/col in the similarity matrix.
   """
+  validate_argument(n_estimators, "n_estimators")
+  validate_argument(max_depth, "max_depth")
+
   # create paths and labels
   rank_set,_ = validate_paths(rank_set, list_name="rank_set")
   style_set,_ = validate_paths(style_set, list_name="style_set")

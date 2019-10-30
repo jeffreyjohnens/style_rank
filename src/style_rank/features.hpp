@@ -608,7 +608,7 @@ def onset_distrubution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Onset(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(mod(note->onset, p->r*4), 0, p->r*4)];
+    (*d)[clamp(mod(note->onset, p->r*4), 0, p->r*4)]++;
   }
   return d;
 }
@@ -620,7 +620,7 @@ def duration_distribution(p, resolution=8):
 unique_ptr<DISCRETE_DIST> Duration(Piece *p) /*MIREX*/ {
   auto d = unique_ptr<DISCRETE_DIST>{new DISCRETE_DIST};
   for (const auto &note : p->notes) {
-    (*d)[clamp(note->duration, 0, p->r*16)];
+    (*d)[clamp(note->duration, 0, p->r*16)]++;
   }
   return d;
 }
