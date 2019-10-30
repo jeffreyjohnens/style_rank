@@ -2,7 +2,7 @@
 
 ![alt text](https://github.com/jeffreyjohnens/style_rank/blob/master/diagram/diagram.png)
 
-StyleRank is a method to rank MIDI files based on their similarity to an arbitrary musical style delineated by a collection of MIDI files. MIDI files are encoded using a novel set of features and an embedding is learned using Random Forests. For a detailed explanation see the [paper](https:://github.com/jeffreyjohnens/style_rank/tree/master/paper).
+StyleRank is a method to rank MIDI files based on their similarity to an arbitrary musical style delineated by a collection of MIDI files. MIDI files are encoded using a novel set of features and an embedding is learned using Random Forests. For a detailed explanation see the [paper](https://github.com/jeffreyjohnens/style_rank/tree/master/paper).
 
 ## Getting Started
 
