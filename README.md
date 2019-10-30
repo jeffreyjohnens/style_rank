@@ -36,9 +36,6 @@ feature_names = ['IntervalClassDist', 'IntervalDist']
 paths = ["corpus_1.mid", "corpus_2.mid", "corpus_3.mid"]
 get_feature_csv(paths, '/path/to/csv_output', feature_names=feature_names)
 ```
-### Features
-
-Find the documentation for each feature here. (in progress)
 
 ## Built With
 
