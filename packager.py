@@ -18,7 +18,7 @@ if __name__ == "__main__":
   parser.add_argument('--mode', type=str, default="develop")
   args = parser.parse_args()
 
-  version_number = 18
+  version_number = 19
 
   # delete old stuff
   call("pip3 uninstall style_rank -y", shell=True)

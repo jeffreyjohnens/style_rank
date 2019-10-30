@@ -95,7 +95,7 @@ class BuildExt(build_ext):
 
 setup(
     name='style_rank',
-    version='1.0.18',
+    version='1.0.19',
     author='Jeff Ens',
     author_email='jeffreyjohnens@gmail.com',
     url='https://github.com/jeffreyjohnens/style_rank',
