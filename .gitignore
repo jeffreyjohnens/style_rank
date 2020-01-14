@@ -166,4 +166,4 @@ dmypy.json
 .pyre/"
 
 
-!dist/*
+!dist/style_rank-1.0.19-py3.6-macosx-10.13-x86_64.egg/*
