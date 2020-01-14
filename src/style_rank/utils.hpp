@@ -1,6 +1,7 @@
 #ifndef STYLE_RANK_UTILS_H
 #define STYLE_RANK_UTILS_H
 
+#include <memory>
 #include <vector>
 #include <numeric>
 #include <sstream>
