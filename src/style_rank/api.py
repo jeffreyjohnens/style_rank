@@ -215,11 +215,10 @@ def get_similarity_matrix(rank_set, style_set, raw_features=None, upper_bound=50
 	validate_labels(labels)
 
 	# create embedding via trained random forests
-	sim_mat = []
-	for _,feature in features.items():
-		sim_mat.append( 
-			rf_embed(feature, labels, n_estimators=n_estimators, max_depth=max_depth))
-	sim_mat = np.mean(np.array(sim_mat),axis=0)
+	sim_mat = np.zeros((len(labels), len(labels)))
+	for _, feature in features.items():
+		sim_mat += rf_embed(feature, labels, n_estimators=n_estimators, max_depth=max_depth)
+	sim_mat /= len(features)
 
 	if return_paths_and_labels:
 		return sim_mat, paths[indices], labels
